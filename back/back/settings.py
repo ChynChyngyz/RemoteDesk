@@ -45,8 +45,16 @@ INSTALLED_APPS = [
     # 'django_filters',
     # 'corsheaders',
 
+    'audit',
+    'agent',
+    'audit',
     'authUser',
-    'client'
+    'core',
+    'devices',
+    'notifications',
+    'orgs',
+    'remote',
+    'tickets'
 ]
 
 MIDDLEWARE = [
