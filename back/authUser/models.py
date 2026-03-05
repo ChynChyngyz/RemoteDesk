@@ -38,7 +38,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     )
     # Связь с организацией (nullable для MSP) [cite: 913]
     organization = models.ForeignKey(
-        'client.Organization',
+        'orgs.Organization',
         on_delete=models.SET_NULL,
         null=True,
         blank=True

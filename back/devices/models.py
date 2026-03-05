@@ -1,13 +1,19 @@
 from django.db import models
-from authUser.models import CustomUser
+from orgs.models import Organization
 
-class Organization(models.Model):
-    organization = models.TextField()
-    name = models.CharField(max_length=255)
-    status = models.BooleanField(default=False)
-    last_seen_at = models.DateTimeField(auto_now_add=True)
-    agents_key_hash = models.ManyToManyField(User)
-    is_active = models.BooleanField(default=True)
+
+class Device(models.Model):
+
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    # site = models.ForeignKey(Site, on_delete=models.SET_NULL, null=True, blank=True)
+    hostname = models.CharField(max_length=255)
+    os = models.CharField(max_length=100)
+    os_version = models.CharField(max_length=100)
+    serial = models.CharField(max_length=255)
+    ip = models.GenericIPAddressField()
+    last_seen_at = models.DateTimeField(null=True, blank=True)
+    status = models.CharField(max_length=20)
+    agent_version = models.CharField(max_length=50)
 
     def __str__(self):
-        return self.name
+        return self.hostname

@@ -27,7 +27,12 @@ SECRET_KEY = 'django-insecure-z$qm7$xe606%9rt_@kth+-d^g*yk8g=liahee=q8a2_xu05ue1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ROOT_URLCONF = 'back.urls'
+
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:8000,http://127.0.0.1:8000').split(',')
 
 
 # Application definition
@@ -47,14 +52,18 @@ INSTALLED_APPS = [
 
     'audit',
     'agent',
-    'audit',
     'authUser',
+    'alert',
     'core',
     'devices',
+    'incident',
+    'metricSample',
     'notifications',
     'orgs',
     'remote',
-    'tickets'
+    'sites',
+    'tickets',
+    'ticketComment'
 ]
 
 MIDDLEWARE = [
@@ -67,7 +76,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'back.urls'
 
 TEMPLATES = [
     {
@@ -83,6 +91,14 @@ TEMPLATES = [
         },
     },
 ]
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Remote Desktop',
+    'DESCRIPTION': 'Remote DEsktop',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': True,
+}
+
 
 WSGI_APPLICATION = 'back.wsgi.application'
 
@@ -133,9 +149,7 @@ SIMPLE_JWT = {
 
 AUTH_USER_MODEL = 'authUser.CustomUser'
 
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:8000,http://127.0.0.1:8000').split(',')
-
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
