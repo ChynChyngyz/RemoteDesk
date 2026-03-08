@@ -1,4 +1,4 @@
-// main_page.dart
+// desktop/pages/main_page.dart
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,137 +21,158 @@ class _AnyDeskPageState extends State<AnyDeskPage> {
       backgroundColor: const Color(0xFFF5F5F5),
       body: Row(
         children: [
-          NavigationRail(
-            backgroundColor: const Color(0xFF2E2E2E),
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: (int index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-            labelType: NavigationRailLabelType.none,
-            leading: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: Icon(Icons.monitor, color: Colors.red[700], size: 40),
-            ),
-            destinations: const [
-              NavigationRailDestination(
-                icon: Icon(Icons.home_outlined, color: Colors.white70),
-                selectedIcon: Icon(Icons.home, color: Colors.white),
-                label: Text('Home'),
+          _buildNavigationRail(),
+          Expanded(child: _getPageContent()),
+        ],
+      ),
+    );
+  }
+
+  /// NavigationRail слева
+  Widget _buildNavigationRail() {
+    return NavigationRail(
+      backgroundColor: const Color(0xFF2E2E2E),
+      selectedIndex: _selectedIndex,
+      onDestinationSelected: (int index) {
+        setState(() {
+          _selectedIndex = index;
+        });
+      },
+      labelType: NavigationRailLabelType.none,
+      leading: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Icon(Icons.monitor, color: Colors.red[700], size: 40),
+      ),
+      destinations: const [
+        NavigationRailDestination(
+          icon: Icon(Icons.home_outlined, color: Colors.white70),
+          selectedIcon: Icon(Icons.home, color: Colors.white),
+          label: Text('Home'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.history_outlined, color: Colors.white70),
+          selectedIcon: Icon(Icons.history, color: Colors.white),
+          label: Text('History'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.settings_outlined, color: Colors.white70),
+          selectedIcon: Icon(Icons.settings, color: Colors.white),
+          label: Text('Settings'),
+        ),
+      ],
+    );
+  }
+
+  /// Возвращает контент в зависимости от выбранной вкладки
+  Widget _getPageContent() {
+    switch (_selectedIndex) {
+      case 0:
+        return _buildMainContent();
+      case 1:
+        return const Center(child: Text("History Page", style: TextStyle(fontSize: 24)));
+      case 2:
+        return const Center(child: Text("Settings Page", style: TextStyle(fontSize: 24)));
+      default:
+        return Container();
+    }
+  }
+
+  /// Главный экран с "This Desk" и "Remote Desk"
+  Widget _buildMainContent() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          color: Colors.white,
+          child: Row(
+            children: [
+              const Text(
+                "New Connection",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              NavigationRailDestination(
-                icon: Icon(Icons.history_outlined, color: Colors.white70),
-                selectedIcon: Icon(Icons.history, color: Colors.white),
-                label: Text('History'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.settings_outlined, color: Colors.white70),
-                selectedIcon: Icon(Icons.settings, color: Colors.white),
-                label: Text('Settings'),
-              ),
+              const Spacer(),
+              Icon(Icons.shield, color: Colors.green[600], size: 20),
+              const SizedBox(width: 10),
+              const Text("Workstation is ready"),
             ],
           ),
-
-          Expanded(
-            child: Column(
+        ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                  color: Colors.white,
-                  child: Row(
-                    children: [
-                      const Text(
-                        "New Connection",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      const Spacer(),
-                      Icon(Icons.shield, color: Colors.green[600], size: 20),
-                      const SizedBox(width: 10),
-                      const Text("Workstation is ready"),
-                    ],
-                  ),
-                ),
-
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Row(
+                  child: _buildInfoCard(
+                    title: "This Desk",
+                    subtitle: "Your address for remote connections",
+                    color: Colors.red[700]!,
+                    content: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: _buildInfoCard(
-                            title: "This Desk",
-                            subtitle: "Your address for remote connections",
-                            color: Colors.red[700]!,
-                            content: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      myId,
-                                      style: const TextStyle(
-                                          fontSize: 28, fontWeight: FontWeight.w300),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.copy, size: 20),
-                                      onPressed: () {
-                                        Clipboard.setData(ClipboardData(text: myId));
-                                      },
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-                                const Text("Password protected",
-                                    style: TextStyle(color: Colors.grey)),
-                              ],
+                        Row(
+                          children: [
+                            Text(
+                              myId,
+                              style: const TextStyle(
+                                  fontSize: 28, fontWeight: FontWeight.w300),
                             ),
+                            IconButton(
+                              icon: const Icon(Icons.copy, size: 20),
+                              onPressed: () {
+                                Clipboard.setData(ClipboardData(text: myId));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text("ID copied to clipboard")),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        const Text("Password protected",
+                            style: TextStyle(color: Colors.grey)),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 24),
+                Expanded(
+                  child: _buildInfoCard(
+                    title: "Remote Desk",
+                    subtitle: "Enter the ID of the remote device",
+                    color: Colors.grey[800]!,
+                    content: Column(
+                      children: [
+                        TextField(
+                          controller: _remoteIdController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            hintText: "Enter Remote Address",
+                            filled: true,
+                            fillColor: Colors.grey[200],
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide.none,
+                            ),
+                            suffixIcon: const Icon(Icons.arrow_forward),
                           ),
                         ),
-
-                        const SizedBox(width: 24),
-
-                        Expanded(
-                          child: _buildInfoCard(
-                            title: "Remote Desk",
-                            subtitle: "Enter the ID of the remote device",
-                            color: Colors.grey[800]!,
-                            content: Column(
-                              children: [
-                                TextField(
-                                  controller: _remoteIdController,
-                                  decoration: InputDecoration(
-                                    hintText: "Enter Remote Address",
-                                    filled: true,
-                                    fillColor: Colors.grey[200],
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    suffixIcon: const Icon(Icons.arrow_forward),
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                                SizedBox(
-                                  width: double.infinity,
-                                  height: 45,
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.red[700],
-                                      foregroundColor: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8)),
-                                    ),
-                                    onPressed: () {
-                                      print("Connecting to: ${_remoteIdController.text}");
-                                    },
-                                    child: const Text("Connect"),
-                                  ),
-                                ),
-                              ],
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 45,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red[700],
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8)),
                             ),
+                            onPressed: _handleConnect,
+                            child: const Text("Connect"),
                           ),
                         ),
                       ],
@@ -161,11 +182,25 @@ class _AnyDeskPageState extends State<AnyDeskPage> {
               ],
             ),
           ),
-        ],
+        ),
+      ],
+    );
+  }
+
+  /// Метод кнопки Connect
+  void _handleConnect() {
+    final remoteId = _remoteIdController.text.trim();
+    if (remoteId.isEmpty) return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RemoteSessionPage(remoteId: remoteId),
       ),
     );
   }
 
+  /// Карточка информации
   Widget _buildInfoCard({
     required String title,
     required String subtitle,
@@ -209,6 +244,26 @@ class _AnyDeskPageState extends State<AnyDeskPage> {
           const SizedBox(height: 25),
           content,
         ],
+      ),
+    );
+  }
+}
+
+/// Страница сеанса удалённого подключения
+class RemoteSessionPage extends StatelessWidget {
+  final String remoteId;
+
+  const RemoteSessionPage({super.key, required this.remoteId});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Session: $remoteId")),
+      body: Center(
+        child: Text(
+          "Connected to $remoteId",
+          style: const TextStyle(fontSize: 24),
+        ),
       ),
     );
   }

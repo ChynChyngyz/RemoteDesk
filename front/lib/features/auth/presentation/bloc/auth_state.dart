@@ -1,3 +1,5 @@
+// features/auth/presentation/bloc/auth_state.dart
+
 import 'package:front/features/auth/domain/entities/user.dart';
 
 abstract class AuthState {}

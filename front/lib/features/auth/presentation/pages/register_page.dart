@@ -12,7 +12,7 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
 
@@ -78,9 +78,9 @@ class _RegisterPageState extends State<RegisterPage> {
               const SizedBox(height: 30),
 
               TextField(
-                controller: _emailController,
+                controller: _phoneController,
                 decoration: InputDecoration(
-                  labelText: "Email",
+                  labelText: "Phone",
                   filled: true,
                   fillColor: Colors.grey[100],
                   border: OutlineInputBorder(

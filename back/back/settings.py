@@ -32,12 +32,20 @@ ROOT_URLCONF = 'back.urls'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
 CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:8000,http://127.0.0.1:8000').split(',')
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "http://localhost:62225",
+    "http://localhost:53202",
+    "http://127.0.0.1:62225",
+]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,7 +56,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'rest_framework',
     # 'django_filters',
-    # 'corsheaders',
+    'corsheaders',
 
     'audit',
     'agent',
@@ -67,6 +75,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -157,7 +166,15 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer", # для тестов
+    },
+}
+
 AUTH_USER_MODEL = 'authUser.CustomUser'
+
+ASGI_APPLICATION = 'back.asgi.application'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

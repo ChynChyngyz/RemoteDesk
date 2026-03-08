@@ -13,34 +13,41 @@ class AuthRepositoryImpl implements IAuthRepository {
   AuthRepositoryImpl(this._dio);
 
   @override
-  Future<User> login(String email, String password) async {
-    final response = await _dio.post(
-      "login/",
-      data: {
-        "email": email,
-        "password": password,
-      },
-    );
+  Future<User> login(String phone, String password) async {
+    try {
+      final response = await _dio.post(
+        "login/",
+        data: {
+          "phone": phone,
+          "password": password,
+        },
+      );
 
-    final access = response.data["access"];
-    final refresh = response.data["refresh"];
+      print('Response: ${response.data}'); // Логирование ответа сервера
 
-    await _storage.write(key: "access", value: access);
-    await _storage.write(key: "refresh", value: refresh);
+      final access = response.data["access"];
+      final refresh = response.data["refresh"];
 
-    _dio.options.headers["Authorization"] = "Bearer $access";
+      await _storage.write(key: "access", value: access);
+      await _storage.write(key: "refresh", value: refresh);
 
-    final userRes = await _dio.get("current_user/");
+      _dio.options.headers["Authorization"] = "Bearer $access";
 
-    return UserModel.fromJson(userRes.data);
+      final userRes = await _dio.get("me/");
+
+      return UserModel.fromJson(userRes.data);
+    } catch (e) {
+      print('Login Error: $e');
+      rethrow;
+    }
   }
 
   @override
-  Future<void> register(String email, String password) async {
+  Future<void> register(String phone, String password) async {
     await _dio.post(
       "register/",
       data: {
-        "email": email,
+        "phone": phone,
         "password": password,
       },
     );

@@ -15,7 +15,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   bool _isLoading = false;
@@ -23,14 +23,14 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
   void _login() {
     context.read<AuthCubit>().login(
-      _emailController.text.trim(),
+      _phoneController.text.trim(),
       _passwordController.text.trim(),
     );
   }
@@ -94,9 +94,9 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 30),
 
                 TextField(
-                  controller: _emailController,
+                  controller: _phoneController,
                   decoration: InputDecoration(
-                    labelText: "Email",
+                    labelText: "Phone",
                     filled: true,
                     fillColor: Colors.grey[100],
                     border: OutlineInputBorder(
