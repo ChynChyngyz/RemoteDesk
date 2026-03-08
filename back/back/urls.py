@@ -27,7 +27,8 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/auth/', include('authUser.urls')),
-    # path('api/v1/client/', include('client.urls')),
+    path('api/v1/orgs/', include('orgs.urls')),
+    path('api/v1/agent/', include('agent.urls')),
     path('api/v1/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/v1/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/v1/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc')

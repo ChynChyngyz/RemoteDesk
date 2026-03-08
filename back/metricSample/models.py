@@ -1,3 +1,4 @@
+# metricSample/models.py
 from django.db import models
 from devices.models import Device
 

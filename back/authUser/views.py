@@ -1,38 +1,40 @@
-from rest_framework import status
+# authUser/views.py
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.permissions import IsAuthenticated
+
 from drf_spectacular.utils import extend_schema
 
-from .serializers import UserSerializer
-from .models import CustomUser
-from rest_framework.permissions import BasePermission
+from .serializers import PhoneLoginSerializer, LogoutSerializer, UserSerializer
+from .permissions import IsOrgAdmin
+
+from devices.models import Device
+from agent.utils import create_agent_key
 
 
-class IsOrgAdmin(BasePermission):
-    def has_permission(self, request, view):
-        return request.user.is_authenticated and \
-               request.user.role == CustomUser.Role.ORG_ADMIN
+class PhoneLoginView(TokenObtainPairView):
+    serializer_class = PhoneLoginSerializer
 
 
-class RegisterView(APIView):
-    permission_classes = [AllowAny]
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
 
     @extend_schema(
-        request=UserSerializer,
-        responses={201: {"message": "User created successfully, please confirm registration"}},
-        tags=["Register"],
+        request=LogoutSerializer,
+        responses={200: None},
+        tags=["Users"],
     )
     def post(self, request):
-        serializer = UserSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        # user = serializer.save(role=CustomUser.Role.CLIENT_VIEWER)
 
-        return Response(
-            {"message": "User created successfully"},
-            status=status.HTTP_201_CREATED
-        )
+        try:
+            refresh_token = request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+        except Exception:
+            pass
+
+        return Response({"message": "Logged out"})
 
 
 class CurrentUserView(APIView):
@@ -43,53 +45,44 @@ class CurrentUserView(APIView):
         tags=["Users"],
     )
     def get(self, request):
-        serializer = UserSerializer(request.user)
+        user = request.user
+        serializer = UserSerializer(user)
         return Response(serializer.data)
 
 
-class DeleteUser(APIView):
+class GenerateAgentTokenView(APIView):
+    """
+    Временный endpoint для генерации токена агента
+    OrgAdmin создает токен для регистрации нового устройства.
+    """
     permission_classes = [IsAuthenticated, IsOrgAdmin]
 
     @extend_schema(
-        request=None,
-        responses={200: {"message": "User deleted successfully"}},
         tags=["Users"],
     )
-    def delete(self, request, pk):
-        if request.user.id == int(pk):
-            return Response({"error": "Your cannot delete yourself"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            user = CustomUser.objects.get(pk=pk)
-        except CustomUser.DoesNotExist:
-            return Response({"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND)
+    def post(self, request):
+        user = request.user
 
-        user.delete()
-        return Response({"message": "User deleted successfully"}, status=status.HTTP_200_OK)
+        if not user.organization:
+            return Response(
+                {"error": "User has no organization"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
+        admin_device, created = Device.objects.get_or_create(
+            organization=user.organization,
+            hostname=f"{user.phone}-admin",
+            defaults={
+                "os": "N/A",
+                "os_version": "N/A",
+                "serial": f"ADMIN-{user.id}",
+                "ip": "0.0.0.0",
+                "status": "active",
+                "agent_version": "N/A"
+            }
+        )
 
-class UpdateUser(APIView):
-    permission_classes = [IsAuthenticated, IsOrgAdmin]
+        # Генерируем токен
+        agent_token = create_agent_key(admin_device)
 
-    @extend_schema(
-        request=None,
-        responses={200: {"message": "User updated successfully"}},
-        tags=["Users"],
-    )
-    def put(self, request, pk):
-        try:
-            user = CustomUser.objects.get(pk=pk)
-        except CustomUser.DoesNotExist:
-            return Response({"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = UserSerializer(user, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-
-        password = serializer.validated_data.pop("password", None)
-
-        updated_user = serializer.save()
-
-        if password:
-            updated_user.set_password(password)
-            updated_user.save()
-
-        return Response({"message": "User updated successfully"}, status=status.HTTP_200_OK)
+        return Response({"org_token": agent_token})
