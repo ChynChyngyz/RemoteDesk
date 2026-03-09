@@ -1,10 +1,12 @@
 // features/auth/data/repositories/auth_repository_impl.dart
+
 import 'package:dio/dio.dart';
 import 'package:front/features/auth/domain/entities/user.dart';
+import 'package:front/features/auth/domain/entities/agent.dart';
 import 'package:front/features/auth/domain/repositories/i_auth_repository.dart';
 import 'package:front/features/auth/data/models/user_model.dart';
+import 'package:front/features/auth/data/models/agent_model.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
 
 class AuthRepositoryImpl implements IAuthRepository {
   final Dio _dio;
@@ -16,14 +18,12 @@ class AuthRepositoryImpl implements IAuthRepository {
   Future<User> login(String phone, String password) async {
     try {
       final response = await _dio.post(
-        "login/",
+        "auth/login/",
         data: {
           "phone": phone,
           "password": password,
         },
       );
-
-      print('Response: ${response.data}'); // Логирование ответа сервера
 
       final access = response.data["access"];
       final refresh = response.data["refresh"];
@@ -33,7 +33,7 @@ class AuthRepositoryImpl implements IAuthRepository {
 
       _dio.options.headers["Authorization"] = "Bearer $access";
 
-      final userRes = await _dio.get("me/");
+      final userRes = await _dio.get("auth/me/");
 
       return UserModel.fromJson(userRes.data);
     } catch (e) {
@@ -43,13 +43,19 @@ class AuthRepositoryImpl implements IAuthRepository {
   }
 
   @override
-  Future<void> register(String phone, String password) async {
-    await _dio.post(
-      "register/",
-      data: {
-        "phone": phone,
-        "password": password,
-      },
-    );
+  Future<Agent> loginWithToken(String hashToken) async {
+    try {
+      final response = await _dio.post(
+        "agent/login_agent/",
+        data: {
+          "agent_key": hashToken,
+        },
+      );
+
+      return AgentModel.fromJson(response.data);
+    } catch (e) {
+      print('Login with Token Error: $e');
+      rethrow;
+    }
   }
 }

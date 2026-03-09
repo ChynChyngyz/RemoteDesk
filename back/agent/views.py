@@ -6,6 +6,7 @@ from rest_framework import status
 
 from .utils import verify_agent_key, create_agent_key
 from .serializers import MetricSampleSerializer
+from authUser.serializers import UserSerializer
 from devices.models import Device
 from orgs.models import Organization
 
@@ -16,6 +17,45 @@ from drf_spectacular.utils import extend_schema
 
 
 User = get_user_model()
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class AgentLoginView(APIView):
+    """
+    Логин агента по токену.
+    """
+    @extend_schema(
+        responses={200: MetricSampleSerializer},
+        tags=["Agent"],
+    )
+    def post(self, request):
+        agent_key = request.data.get("agent_key")
+
+        if not agent_key:
+            raise ValidationError({"detail": "Missing 'agent_key'"})
+
+        device = verify_agent_key(agent_key)
+
+        if not device:
+            raise ValidationError({"agent_key": "Invalid or revoked agent key"})
+
+        user = device.organization.users.filter(role='Technician').first()
+
+        if not user:
+            raise ValidationError({"detail": "User not found"})
+
+        user_serializer = UserSerializer(user)
+
+        return Response(
+            {
+                "device_id": device.id,
+                "hostname": device.hostname,
+                "organization": device.organization.name,
+                "status": "authenticated",
+                "role": user_serializer.data['role'],
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 @method_decorator(csrf_exempt, name='dispatch')

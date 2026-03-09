@@ -28,6 +28,18 @@
       <excludeFolder url="file://$MODULE_DIR$/front/windows/flutter/ephemeral/.plugin_symlinks/path_provider_windows/example/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/front/windows/flutter/ephemeral/.plugin_symlinks/path_provider_windows/example/build" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
+      <excludeFolder url="file://$MODULE_DIR$/front/linux/flutter/ephemeral/.plugin_symlinks/flutter_webrtc/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/front/linux/flutter/ephemeral/.plugin_symlinks/flutter_webrtc/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/front/linux/flutter/ephemeral/.plugin_symlinks/flutter_webrtc/build" />
+      <excludeFolder url="file://$MODULE_DIR$/front/linux/flutter/ephemeral/.plugin_symlinks/flutter_webrtc/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/front/linux/flutter/ephemeral/.plugin_symlinks/flutter_webrtc/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/front/linux/flutter/ephemeral/.plugin_symlinks/flutter_webrtc/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/front/windows/flutter/ephemeral/.plugin_symlinks/flutter_webrtc/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/front/windows/flutter/ephemeral/.plugin_symlinks/flutter_webrtc/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/front/windows/flutter/ephemeral/.plugin_symlinks/flutter_webrtc/build" />
+      <excludeFolder url="file://$MODULE_DIR$/front/windows/flutter/ephemeral/.plugin_symlinks/flutter_webrtc/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/front/windows/flutter/ephemeral/.plugin_symlinks/flutter_webrtc/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/front/windows/flutter/ephemeral/.plugin_symlinks/flutter_webrtc/example/build" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.14 (A007)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

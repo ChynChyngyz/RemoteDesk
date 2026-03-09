@@ -1,3 +1,4 @@
+// main.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -8,9 +9,7 @@ import 'package:front/features/auth/presentation/pages/login_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-
   final repository = AuthRepositoryImpl(DioClient.dio);
-
   runApp(MyApp(repository: repository));
 }
 

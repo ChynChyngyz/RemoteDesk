@@ -1,43 +1,43 @@
-// features/remote_session/presentation/pages/remote_session_page.dart
+// features/remote_session/presentation/pages/remote_view_page.dart
 
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:front/features/remote_session/data/services/webrtc_service.dart';
+
 
 class RemoteSessionPage extends StatefulWidget {
   final String remoteId;
-  final bool isTechnician; // Добавляем роль: техник или юзер
+  final bool isTechnician;
 
-  const RemoteSessionPage({
-    super.key,
-    required this.remoteId,
-    this.isTechnician = true, // По умолчанию считаем, что техник подключается к кому-то
-  });
+  const RemoteSessionPage({super.key, required this.remoteId, required this.isTechnician});
 
   @override
   State<RemoteSessionPage> createState() => _RemoteSessionPageState();
 }
 
 class _RemoteSessionPageState extends State<RemoteSessionPage> {
-  // Рендерер для отображения видео
   final RTCVideoRenderer _videoRenderer = RTCVideoRenderer();
+  late WebRTCService webrtc;
 
   @override
   void initState() {
     super.initState();
-    _setupSession();
+    _init();
   }
 
-  Future<void> _setupSession() async {
-    // 1. Инициализируем рендерер
+  Future<void> _init() async {
     await _videoRenderer.initialize();
-
-    // 2. Здесь будет вызов Cubit для установки соединения через Django
-    // context.read<RemoteSessionCubit>().startConnection(widget.remoteId);
+    webrtc = WebRTCService(_videoRenderer);
+    await webrtc.connect(widget.remoteId);
+    if (!widget.isTechnician) {
+      await webrtc.shareScreen();
+    }
   }
 
   @override
   void dispose() {
     _videoRenderer.dispose();
+    webrtc.dispose();
     super.dispose();
   }
 
@@ -55,30 +55,11 @@ class _RemoteSessionPageState extends State<RemoteSessionPage> {
           )
         ],
       ),
-      body: Stack(
-        children: [
-          // Основное окно видео
-          Center(
-            child: RTCVideoView(
-              _videoRenderer,
-              objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
-            ),
-          ),
-
-          // Оверлей с информацией
-          Positioned(
-            bottom: 20,
-            left: 20,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              color: Colors.black54,
-              child: Text(
-                widget.isTechnician ? "Viewing: ${widget.remoteId}" : "Sharing Screen...",
-                style: const TextStyle(color: Colors.white),
-              ),
-            ),
-          ),
-        ],
+      body: Center(
+        child: RTCVideoView(
+          _videoRenderer,
+          objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+        ),
       ),
     );
   }

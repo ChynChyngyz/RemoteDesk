@@ -1,37 +1,32 @@
-// features/auth/presentation/pages/login_page.dart
+// features/auth/presentation/pages/login_tech_page.dart
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:front/features/auth/presentation/bloc/auth_state.dart';
-import 'package:front/features/auth/presentation/pages/login_tech_page.dart';
-import 'package:front/desktop/pages/user_home_page.dart';
+import 'package:front/features/auth/presentation/pages/login_page.dart';
+import 'package:front/desktop/pages/agent_home_page.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class LoginTechPage extends StatefulWidget {
+  const LoginTechPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<LoginTechPage> createState() => _LoginTechPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
+class _LoginTechPageState extends State<LoginTechPage> {
+  final TextEditingController _hashTokenController = TextEditingController();
   bool _isLoading = false;
-  bool _obscurePassword = true;
 
   @override
   void dispose() {
-    _phoneController.dispose();
-    _passwordController.dispose();
+    _hashTokenController.dispose();
     super.dispose();
   }
 
   void _login() {
-    context.read<AuthCubit>().login(
-      _phoneController.text.trim(),
-      _passwordController.text.trim(),
+    context.read<AuthCubit>().loginWithToken(
+      _hashTokenController.text.trim(),
     );
   }
 
@@ -45,13 +40,15 @@ class _LoginPageState extends State<LoginPage> {
           setState(() => _isLoading = false);
         }
 
-        if (state is AuthAuthenticated) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const UserHomePage(),
-            ),
-          );
+        if (state is AuthAgentAuthenticated) {
+          if (state.role == "Technician") {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const AnyDeskPage(),
+              ),
+            );
+          }
         }
 
         if (state is AuthError) {
@@ -74,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
                   color: Colors.black.withOpacity(0.05),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
-                )
+                ),
               ],
             ),
             child: Column(
@@ -82,21 +79,18 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 Icon(Icons.lock, size: 50, color: Colors.red[700]),
                 const SizedBox(height: 20),
-
                 const Text(
-                  "Sign In",
+                  "Technician Login",
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-
                 const SizedBox(height: 30),
-
                 TextField(
-                  controller: _phoneController,
+                  controller: _hashTokenController,
                   decoration: InputDecoration(
-                    labelText: "Phone",
+                    labelText: "Hash Token",
                     filled: true,
                     fillColor: Colors.grey[100],
                     border: OutlineInputBorder(
@@ -105,37 +99,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-
-                const SizedBox(height: 20),
-
-                TextField(
-                  controller: _passwordController,
-                  obscureText: _obscurePassword,
-                  decoration: InputDecoration(
-                    labelText: "Password",
-                    filled: true,
-                    fillColor: Colors.grey[100],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none,
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
-                    ),
-                  ),
-                ),
-
                 const SizedBox(height: 30),
-
                 SizedBox(
                   width: double.infinity,
                   height: 48,
@@ -158,19 +122,16 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-
-                const SizedBox(height: 20),
-
                 TextButton(
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const LoginTechPage(),
+                        builder: (_) => const LoginPage(),
                       ),
                     );
                   },
-                  child: const Text("Tech? Login here"),
+                  child: const Text("Client? Login here"),
                 ),
               ],
             ),

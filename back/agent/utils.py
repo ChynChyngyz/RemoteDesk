@@ -2,6 +2,9 @@
 import hashlib
 import secrets
 from .models import AgentKey
+import logging
+
+logger = logging.getLogger(__name__)
 
 def create_agent_key(device):
     """
@@ -15,11 +18,13 @@ def create_agent_key(device):
 
 def verify_agent_key(token):
     """
-    Проверяет токен агента, возвращает Device или None
+    Проверяет токен агента, возвращает Device или None.
+    Логирует ошибки при неудачных попытках.
     """
     token_hash = hashlib.sha256(token.encode()).hexdigest()
     try:
         agent_key = AgentKey.objects.get(token_hash=token_hash, revoked_at__isnull=True)
         return agent_key.device
     except AgentKey.DoesNotExist:
+        logger.warning(f"Invalid agent key attempt: {token}")
         return None

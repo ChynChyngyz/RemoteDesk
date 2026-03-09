@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:front/desktop/pages/main_page.dart';
+import 'package:front/desktop/pages/agent_home_page.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});

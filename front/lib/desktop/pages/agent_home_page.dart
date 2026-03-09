@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:front/features/auth/presentation/pages/remote_view_page.dart';
 
 class AnyDeskPage extends StatefulWidget {
   const AnyDeskPage({super.key});
@@ -28,7 +29,6 @@ class _AnyDeskPageState extends State<AnyDeskPage> {
     );
   }
 
-  /// NavigationRail слева
   Widget _buildNavigationRail() {
     return NavigationRail(
       backgroundColor: const Color(0xFF2E2E2E),
@@ -63,7 +63,6 @@ class _AnyDeskPageState extends State<AnyDeskPage> {
     );
   }
 
-  /// Возвращает контент в зависимости от выбранной вкладки
   Widget _getPageContent() {
     switch (_selectedIndex) {
       case 0:
@@ -77,7 +76,6 @@ class _AnyDeskPageState extends State<AnyDeskPage> {
     }
   }
 
-  /// Главный экран с "This Desk" и "Remote Desk"
   Widget _buildMainContent() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,24 +114,21 @@ class _AnyDeskPageState extends State<AnyDeskPage> {
                           children: [
                             Text(
                               myId,
-                              style: const TextStyle(
-                                  fontSize: 28, fontWeight: FontWeight.w300),
+                              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w300),
                             ),
                             IconButton(
                               icon: const Icon(Icons.copy, size: 20),
                               onPressed: () {
                                 Clipboard.setData(ClipboardData(text: myId));
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text("ID copied to clipboard")),
+                                  const SnackBar(content: Text("ID copied to clipboard")),
                                 );
                               },
                             ),
                           ],
                         ),
                         const SizedBox(height: 10),
-                        const Text("Password protected",
-                            style: TextStyle(color: Colors.grey)),
+                        const Text("Password protected", style: TextStyle(color: Colors.grey)),
                       ],
                     ),
                   ),
@@ -187,7 +182,6 @@ class _AnyDeskPageState extends State<AnyDeskPage> {
     );
   }
 
-  /// Метод кнопки Connect
   void _handleConnect() {
     final remoteId = _remoteIdController.text.trim();
     if (remoteId.isEmpty) return;
@@ -195,12 +189,14 @@ class _AnyDeskPageState extends State<AnyDeskPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => RemoteSessionPage(remoteId: remoteId),
+        builder: (_) => RemoteSessionPage(
+          remoteId: "test",
+          isTechnician: false,
+        ),
       ),
     );
   }
 
-  /// Карточка информации
   Widget _buildInfoCard({
     required String title,
     required String subtitle,
@@ -233,37 +229,11 @@ class _AnyDeskPageState extends State<AnyDeskPage> {
             ),
           ),
           const SizedBox(height: 15),
-          Text(
-            title,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            subtitle,
-            style: TextStyle(color: Colors.grey[600], fontSize: 14),
-          ),
+          Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          Text(subtitle, style: TextStyle(color: Colors.grey[600], fontSize: 14)),
           const SizedBox(height: 25),
           content,
         ],
-      ),
-    );
-  }
-}
-
-/// Страница сеанса удалённого подключения
-class RemoteSessionPage extends StatelessWidget {
-  final String remoteId;
-
-  const RemoteSessionPage({super.key, required this.remoteId});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Session: $remoteId")),
-      body: Center(
-        child: Text(
-          "Connected to $remoteId",
-          style: const TextStyle(fontSize: 24),
-        ),
       ),
     );
   }
