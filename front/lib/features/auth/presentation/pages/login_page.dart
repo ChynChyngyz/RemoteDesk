@@ -5,7 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:front/features/auth/presentation/bloc/auth_state.dart';
 import 'package:front/features/auth/presentation/pages/login_tech_page.dart';
+import 'package:front/desktop/pages/admin/admin_dashboard.dart';
 import 'package:front/desktop/pages/user_home_page.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -46,12 +48,35 @@ class _LoginPageState extends State<LoginPage> {
         }
 
         if (state is AuthAuthenticated) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const UserHomePage(),
-            ),
-          );
+
+          final role = state.user.role;
+
+          if (role == "OrgAdmin") {
+
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const AdminDashboard(),
+              ),
+            );
+
+          } else if (role == "User") {
+
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const UserHomePage(),
+              ),
+            );
+
+          } else {
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Unknown role")),
+            );
+
+          }
+
         }
 
         if (state is AuthError) {

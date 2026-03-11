@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:front/features/auth/presentation/pages/remote_view_page.dart';
+import 'package:front/desktop/pages/remote_view_page.dart';
 
 class AnyDeskPage extends StatefulWidget {
   const AnyDeskPage({super.key});

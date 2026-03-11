@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:front/features/auth/presentation/pages/remote_view_page.dart';
+import 'package:front/desktop/pages/remote_view_page.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 

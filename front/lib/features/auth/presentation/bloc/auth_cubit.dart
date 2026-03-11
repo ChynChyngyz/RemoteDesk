@@ -16,7 +16,7 @@ class AuthCubit extends Cubit<AuthState> {
       final user = await repository.login(phone, password);
       emit(AuthAuthenticated(user));
     } catch (e) {
-      emit(AuthError(e.toString()));
+      emit(AuthError(e.toString().replaceAll("Exception: ", "")));
     }
   }
 
@@ -27,7 +27,7 @@ class AuthCubit extends Cubit<AuthState> {
       final user = await repository.loginWithToken(hashToken);
       emit(AuthAgentAuthenticated(user.role));
     } catch (e) {
-      emit(AuthError(e.toString()));
+      emit(AuthError(e.toString().replaceAll("Exception: ", "")));
     }
   }
 }

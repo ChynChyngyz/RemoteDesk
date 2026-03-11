@@ -2,18 +2,22 @@
 
 import 'package:front/features/auth/domain/entities/user.dart';
 
-
 class UserModel extends User {
-  UserModel(
-      {
-        required int id,
-        required String phone}
-      ) :
-        super
-          (id: id, phone: phone);
+  UserModel({
+    required int id,
+    required String phone,
+    required String role,
+  }) : super(
+    id: id,
+    phone: phone,
+    role: role,
+  );
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
-    return UserModel(id: json['id'], phone: json['phone']);
+    return UserModel(
+      id: json['id'],
+      phone: json['phone'],
+      role: json['role'],
+    );
   }
 }
-

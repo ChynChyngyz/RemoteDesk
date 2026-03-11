@@ -1,4 +1,4 @@
-// features/remote_session/presentation/pages/remote_view_page.dart
+// desktop/pages/remote_view_page.dart
 
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';

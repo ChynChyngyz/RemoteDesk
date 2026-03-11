@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
       create: (_) => AuthCubit(repository),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Remote Desktop App',
+        title: 'Remote Desktop',
         theme: ThemeData(
           primarySwatch: Colors.red,
           scaffoldBackgroundColor: const Color(0xFFF5F5F5),

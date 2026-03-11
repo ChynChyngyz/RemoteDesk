@@ -7,8 +7,11 @@ import 'package:front/features/auth/domain/repositories/i_auth_repository.dart';
 import 'package:front/features/auth/data/models/user_model.dart';
 import 'package:front/features/auth/data/models/agent_model.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:front/core/errors/error_handler.dart';
+
 
 class AuthRepositoryImpl implements IAuthRepository {
+
   final Dio _dio;
   final _storage = const FlutterSecureStorage();
 
@@ -16,7 +19,9 @@ class AuthRepositoryImpl implements IAuthRepository {
 
   @override
   Future<User> login(String phone, String password) async {
+
     try {
+
       final response = await _dio.post(
         "auth/login/",
         data: {
@@ -36,15 +41,23 @@ class AuthRepositoryImpl implements IAuthRepository {
       final userRes = await _dio.get("auth/me/");
 
       return UserModel.fromJson(userRes.data);
-    } catch (e) {
-      print('Login Error: $e');
-      rethrow;
+
+    } on DioException catch (e) {
+
+      throw Exception(ErrorHandler.parse(e));
+
+    } catch (_) {
+
+      throw Exception("Unexpected error");
+
     }
   }
 
   @override
   Future<Agent> loginWithToken(String hashToken) async {
+
     try {
+
       final response = await _dio.post(
         "agent/login_agent/",
         data: {
@@ -53,9 +66,16 @@ class AuthRepositoryImpl implements IAuthRepository {
       );
 
       return AgentModel.fromJson(response.data);
-    } catch (e) {
-      print('Login with Token Error: $e');
-      rethrow;
+
+    } on DioException catch (e) {
+
+      throw Exception(ErrorHandler.parse(e));
+
+    } catch (_) {
+
+      throw Exception("Unexpected error");
+
     }
   }
+
 }
