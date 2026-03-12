@@ -57,6 +57,10 @@ class DioAdmin {
     }
   }
 
+  static Future<Response> getOrganization(int orgId) {
+    return _dio.get("orgs/organizations/$orgId/");
+  }
+
   /// TOKEN
 
   static Future<Response> generateAgentToken() {

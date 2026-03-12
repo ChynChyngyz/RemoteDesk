@@ -56,11 +56,13 @@ class _LoginPageState extends State<LoginPage> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (_) => const AdminDashboard(),
+                builder: (_) => AdminDashboard(
+                  orgId: state.user.organization,
+                ),
               ),
             );
 
-          } else if (role == "User") {
+          } else if (role == "ClientViewer") {
 
             Navigator.pushReplacement(
               context,

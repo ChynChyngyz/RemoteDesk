@@ -6,7 +6,12 @@ import 'organization_page.dart';
 import 'users_page.dart';
 
 class AdminDashboard extends StatefulWidget {
-  const AdminDashboard({super.key});
+  final int orgId;
+
+  const AdminDashboard({
+    super.key,
+    required this.orgId,
+  });
 
   @override
   State<AdminDashboard> createState() => _AdminDashboardState();
@@ -16,11 +21,18 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   int index = 0;
 
-  final pages = const [
-    OrganizationPage(),
-    UsersPage(),
-    AgentTokenPage(),
-  ];
+  late final List<Widget> pages;
+
+  @override
+  void initState() {
+    super.initState();
+
+    pages = [
+      OrganizationPage(orgId: widget.orgId),
+      UsersPage(orgId: widget.orgId),
+      const AgentTokenPage(),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +68,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
             ],
           ),
 
-          Expanded(child: pages[index])
+          Expanded(
+            child: pages[index],
+          )
 
         ],
       ),

@@ -9,7 +9,13 @@ import 'package:front/core/network/dio_admin.dart';
 import 'create_user_dialog.dart';
 
 class UsersPage extends StatefulWidget {
-  const UsersPage({super.key});
+
+  final int orgId;
+
+  const UsersPage({
+    super.key,
+    required this.orgId,
+  });
 
   @override
   State<UsersPage> createState() => _UsersPageState();
