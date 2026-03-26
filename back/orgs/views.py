@@ -16,7 +16,10 @@ from .serializers import OrganizationSerializer
 class OrgCreateView(APIView):
     permission_classes = [IsAuthenticated, IsOrgAdmin]
     serializer_class = OrganizationSerializer
-
+    @extend_schema(
+        responses={200: OrganizationSerializer},
+        tags=["Organization"],
+    )
     def post(self, request):
         if request.user.organization:
             raise ValidationError(

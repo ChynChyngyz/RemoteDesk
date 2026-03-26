@@ -43,6 +43,10 @@ class OrgUsersView(APIView):
 class OrgUserDetailView(APIView):
     permission_classes = [IsAuthenticated, IsOrgAdmin]
     serializer_class = OrgUserSerializer
+    @extend_schema(
+        responses={200: OrgUserSerializer},
+        tags=["Organization Users"],
+    )
     def get(self, request):
         users = User.objects.filter(
             organization=request.user.organization
