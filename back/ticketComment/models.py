@@ -1,3 +1,5 @@
+# ticketComment/models.py
+
 from django.db import models
 from tickets.models import Ticket
 from authUser.models import CustomUser

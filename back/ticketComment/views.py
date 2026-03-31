@@ -7,27 +7,39 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema_view, extend_schema
 
-from .permissions import IsOrgAdmin
+# from .permissions import IsOrgAdmin
 from .models import TicketComment
 from .serializers import TicketCommentSerializers
+from tickets.models import Ticket
 
 
+@extend_schema_view(
+    list=extend_schema(tags=['Ticket Comments']),
+    create=extend_schema(tags=['Ticket Comments']),
+)
 class TicketCommentsView(viewsets.ModelViewSet):
     serializer_class = TicketCommentSerializers
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         ticket_id = self.kwargs["pk"]
-
         return TicketComment.objects.filter(
             ticket_id=ticket_id,
             ticket__organization=self.request.user.organization
         )
 
     def perform_create(self, serializer):
+        ticket_id = self.kwargs["pk"]
+
+        ticket = get_object_or_404(
+            Ticket,
+            id=ticket_id,
+            organization=self.request.user.organization
+        )
+
         serializer.save(
             author=self.request.user,
-            ticket_id=self.kwargs["pk"]
+            ticket=ticket
         )

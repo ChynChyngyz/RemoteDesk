@@ -25,7 +25,7 @@ class AgentLoginView(APIView):
     Логин агента по токену.
     """
     @extend_schema(
-        responses={200: MetricSampleSerializer},
+        responses={200},
         tags=["Agent"],
     )
     def post(self, request):
@@ -64,7 +64,7 @@ class DeviceRegisterView(APIView):
     Регистрация нового устройства (агента) через токен, выданный OrgAdmin.
     """
     @extend_schema(
-        responses={200: MetricSampleSerializer},
+        responses={200},
         tags=["Agent"],
     )
     def post(self, request):

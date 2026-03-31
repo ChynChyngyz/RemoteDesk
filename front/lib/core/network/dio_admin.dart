@@ -66,4 +66,21 @@ class DioAdmin {
   static Future<Response> generateAgentToken() {
     return _dio.post("auth/generate_agent_token/");
   }
+  
+  /// TICKETS & COMMENTS
+
+  static Future<Response> getTickets() {
+    return _dio.get("orgs/tickets/");
+  }
+
+  static Future<Response> getTicketComments(int ticketId) {
+    return _dio.get("orgs/tickets/$ticketId/comments/");
+  }
+
+  static Future<Response> createTicketComment(int ticketId, String body) {
+    return _dio.post(
+      "orgs/tickets/$ticketId/comments/",
+      data: {"body": body},
+    );
+  }
 }

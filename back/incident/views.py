@@ -1,51 +1,23 @@
 # incident/views.py
-from rest_framework import status, viewsets
-from rest_framework.views import APIView
-from rest_framework.response import Response
+
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import ValidationError
-from django.shortcuts import get_object_or_404
 
-from drf_spectacular.utils import extend_schema
-
-from .permissions import IsOrgAdmin
 from .models import Incident
 from .serializers import IncidentSerializers
 
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
 
-class IncidentCreate(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, IsOrgAdmin]
-    @extend_schema(
-        responses={200},
-        tags=["Incidents"],
-    )
-    def post(self):
-        ...
+@extend_schema_view(
+    list=extend_schema(tags=['Incident']),
+    create=extend_schema(tags=['Incident']),
+)
+class IncidentViewSet(viewsets.ModelViewSet):
+    serializer_class = IncidentSerializers
+    permission_classes = [IsAuthenticated]
 
+    http_method_names = ['get', 'patch', 'head', 'options']
 
-class IncidentView(viewsets.ModelViewSet):
-
-    def get_object(self):
-        ...
-
-    @extend_schema(
-        responses={200},
-        tags=["Incidents"],
-    )
-    def get(self):
-        ...
-
-    @extend_schema(
-        responses={200},
-        tags=["Incidents"],
-    )
-    def put(self):
-        ...
-
-    @extend_schema(
-        responses={200},
-        tags=["Incidents"],
-    )
-    def delete(self):
-        ...
+    def get_queryset(self):
+        return Incident.objects.filter(organization=self.request.user.organization)

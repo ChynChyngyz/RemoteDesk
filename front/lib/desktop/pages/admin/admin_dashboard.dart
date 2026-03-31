@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'agent_token_page.dart';
 import 'organization_page.dart';
 import 'users_page.dart';
+import 'admin_tickets_page.dart';
 
 class AdminDashboard extends StatefulWidget {
   final int orgId;
@@ -31,6 +32,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       OrganizationPage(orgId: widget.orgId),
       UsersPage(orgId: widget.orgId),
       const AgentTokenPage(),
+      AdminTicketsPage(orgId: widget.orgId),
     ];
   }
 
@@ -63,6 +65,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
               NavigationRailDestination(
                 icon: Icon(Icons.vpn_key),
                 label: Text("Agent Token"),
+              ),
+
+              NavigationRailDestination(
+                icon: Icon(Icons.confirmation_number),
+                label: Text("Tickets"),
               ),
 
             ],

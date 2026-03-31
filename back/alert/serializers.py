@@ -1,9 +1,13 @@
-# orgs/serializers.py
-from rest_framework import serializers
-from .models import Organization
+# alert/serializers.py
 
+from rest_framework import serializers
+from .models import AlertRule
 
 class AlertSerializers(serializers.ModelSerializer):
     class Meta:
-        model = Organization
-        fields = ["id", "name", "city", "industry", "is_active"]
+        model = AlertRule
+        fields = [
+            'id', 'organization', 'metric', 'operator',
+            'threshold', 'duration_sec', 'severity', 'is_active'
+        ]
+        read_only_fields = ['id', 'organization']

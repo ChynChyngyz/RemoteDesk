@@ -3,35 +3,48 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:front/core/network/dio_client.dart';
+
 import 'package:front/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:front/features/auth/domain/repositories/i_auth_repository.dart';
 import 'package:front/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:front/features/auth/presentation/pages/login_page.dart';
 
+import 'package:front/features/tickets/presentation/bloc/ticket_cubit.dart';
+import 'package:front/features/tickets/data/repositories/ticket_repository_impl.dart';
+
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  final repository = AuthRepositoryImpl(DioClient.dio);
-  runApp(MyApp(repository: repository));
+  final authRepository = AuthRepositoryImpl(DioClient.dio);
+  final ticketRepository = TicketRepositoryImpl(DioClient.dio);
+  runApp(MyApp(repositoryAuth: authRepository, repositoryTicket: ticketRepository));
 }
 
 class MyApp extends StatelessWidget {
-  final AuthRepositoryImpl repository;
+  final AuthRepositoryImpl repositoryAuth;
+  final TicketRepositoryImpl repositoryTicket;
 
   const MyApp({
     super.key,
-    required this.repository,
+    required this.repositoryAuth,
+    required this.repositoryTicket
   });
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => AuthCubit(repository),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => AuthCubit(repositoryAuth),
+        ),
+
+        BlocProvider(
+          create: (_) => TicketCubit(repositoryTicket),
+        ),
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Remote Desktop',
-        theme: ThemeData(
-          primarySwatch: Colors.red,
-          scaffoldBackgroundColor: const Color(0xFFF5F5F5),
-        ),
         home: const LoginPage(),
       ),
     );

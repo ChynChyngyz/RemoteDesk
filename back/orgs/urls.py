@@ -1,3 +1,5 @@
+# orgs/urls.py
+
 from django.urls import path
 from django.conf.urls.static import static
 from django.conf import settings
@@ -27,23 +29,41 @@ urlpatterns = [
 
     # Alert
     path("alert-rules/", views_alert.AlertRulesView.as_view({'get': 'list', 'post': 'create'})),
+    path("alert-rules/<int:pk>/", views_alert.AlertRulesView.as_view({
+            'get': 'retrieve',
+            'put': 'update',
+            'patch': 'partial_update',
+            'delete': 'destroy'
+            })
+        ),
 
     # Incident
-    path("incidents/", views_incident.IncidentView.as_view({'get': 'list', 'post': 'create'})),
-    path("incidents/<int:pk>/", views_incident.IncidentCreate.as_view({'get': 'list', 'post': 'create'})),
+    path("incidents/", views_incident.IncidentViewSet.as_view({'get': 'list'})),
+    path("incidents/<int:pk>/", views_incident.IncidentViewSet.as_view({
+            'get': 'retrieve',
+            'patch': 'partial_update'
+            })
+        ),
 
     # Tickets
-    path("tickets/", views_tickets.TicketsView.as_view()),
-    path("tickets/<int:pk>/", views_tickets.TicketDetailView.as_view()),
+    path("tickets/", views_tickets.TicketViewSet.as_view({
+              'get': 'list',
+              'post': 'create'
+            })
+        ),
+    path("tickets/<int:pk>/", views_tickets.TicketViewSet.as_view({
+              'get': 'retrieve',
+              'patch': 'partial_update',
+              'delete': 'destroy'
+            })
+        ),
 
     # Ticket comment
-    path(
-        "tickets/<int:pk>/comments/",
-        views_ticketComment.TicketCommentsView.as_view({
-            'get': 'list',
-            'post': 'create'
-        })
-    ),
+    path("tickets/<int:pk>/comments/", views_ticketComment.TicketCommentsView.as_view({
+                'get': 'list',
+                'post': 'create'
+            })
+        ),
 
     # Remote session
     path("remote-session/request", views_remote.RemoteSessionRequestView.as_view()),
