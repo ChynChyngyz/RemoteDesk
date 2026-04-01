@@ -1,3 +1,5 @@
+# devices/models.py
+
 from django.db import models
 from orgs.models import Organization
 

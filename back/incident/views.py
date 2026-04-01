@@ -11,7 +11,8 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 
 @extend_schema_view(
     list=extend_schema(tags=['Incident']),
-    create=extend_schema(tags=['Incident']),
+    retrieve=extend_schema(tags=['Incident']),
+    partial_update=extend_schema(tags=['Incident']),
 )
 class IncidentViewSet(viewsets.ModelViewSet):
     serializer_class = IncidentSerializers

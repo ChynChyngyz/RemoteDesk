@@ -12,6 +12,8 @@ from incident import views as views_incident
 from tickets import views as views_tickets
 from ticketComment import views as views_ticketComment
 from remote import views as views_remote
+from notifications import views as views_notifications
+from audit import views as views_audit
 
 
 urlpatterns = [
@@ -25,7 +27,7 @@ urlpatterns = [
     path("users/<int:pk>", views_users.OrgUserDetailView.as_view()),
 
     # Devices
-    path("devices/", views_devices.DevicesView.as_view()),
+    path("devices/", views_devices.DevicesViewSet.as_view({'get': 'list', 'post': 'create'})),
 
     # Alert
     path("alert-rules/", views_alert.AlertRulesView.as_view({'get': 'list', 'post': 'create'})),
@@ -67,5 +69,14 @@ urlpatterns = [
 
     # Remote session
     path("remote-session/request", views_remote.RemoteSessionRequestView.as_view()),
+
+    # Notifications
+    path("notifications/", views_notifications.NotificationViewSet.as_view({'get': 'list'})),
+    path("notifications/<int:pk>/", views_notifications.NotificationViewSet.as_view({'patch': 'partial_update'})),
+
+    # Audit
+    path("audit/", views_audit.AuditEventViewSet.as_view({"get": "list"})),
+    path("audit/<int:pk>/", views_audit.AuditEventViewSet.as_view({'get': 'retrieve'})),
+
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,14 +1,17 @@
+# audit/models.py
+
 from django.db import models
+from orgs.models import Organization
 from authUser.models import CustomUser
+from devices.models import Device
 
-
-class Notification(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='audit_notifications')
-    type = models.CharField(max_length=50)
-    payload_json = models.JSONField()
-    read_at = models.DateTimeField(null=True, blank=True)
+class AuditEvent(models.Model):
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    actor_user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
+    actor_device = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True)
+    type = models.CharField(max_length=255) # Например: 'agent_token_issued', 'remote_session_started'
+    metadata_json = models.JSONField(default=dict)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return (self.type,
-                self.created_at)
+        return f"{self.type} - Org: {self.organization.name}"

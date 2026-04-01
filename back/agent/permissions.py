@@ -1,17 +1,29 @@
 from rest_framework.permissions import BasePermission
+from .utils import verify_agent_key
 
 
-class IsTechnician(BasePermission):
+def get_agent_key_from_request(request):
+    auth_header = request.META.get('HTTP_AUTHORIZATION', '')
+    if auth_header.startswith('Bearer '):
+        return auth_header.split(' ')[1]
+
+    if hasattr(request, 'data') and isinstance(request.data, dict):
+        return request.data.get("agent_key")
+    return None
+
+
+class IsAuthenticatedAgent(BasePermission):
+    message = "Invalid, missing, or revoked agent key"
+
     def has_permission(self, request, view):
-        return request.user.role == "Technician"
+        agent_key = get_agent_key_from_request(request)
 
-class IsClientViewer(BasePermission):
-    def has_permission(self, request, view):
-        return request.user.role == "ClientViewer"
+        if not agent_key:
+            return False
 
-class IsOrgAdmin(BasePermission):
-    def has_permission(self, request, view):
-        return (
-            request.user.is_authenticated and
-            request.user.role == "OrgAdmin"
-        )
+        device = verify_agent_key(agent_key)
+        if not device:
+            return False
+
+        request.device = device
+        return True
