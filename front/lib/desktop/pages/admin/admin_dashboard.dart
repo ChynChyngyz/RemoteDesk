@@ -5,6 +5,11 @@ import 'agent_token_page.dart';
 import 'organization_page.dart';
 import 'users_page.dart';
 import 'admin_tickets_page.dart';
+import 'device_page.dart';
+import 'incident_page.dart';
+import 'notification_page.dart';
+import 'audit_page.dart';
+import 'metric_sample_page.dart';
 
 class AdminDashboard extends StatefulWidget {
   final int orgId;
@@ -33,6 +38,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
       UsersPage(orgId: widget.orgId),
       const AgentTokenPage(),
       AdminTicketsPage(orgId: widget.orgId),
+      DevicePage(orgId: widget.orgId),
+      IncidentPage(orgId: widget.orgId),
+      NotificationPage(orgId: widget.orgId),
+      AuditEventPage(orgId: widget.orgId),
+      MetricSamplePage(orgId: widget.orgId),
     ];
   }
 
@@ -70,6 +80,31 @@ class _AdminDashboardState extends State<AdminDashboard> {
               NavigationRailDestination(
                 icon: Icon(Icons.confirmation_number),
                 label: Text("Tickets"),
+              ),
+
+              NavigationRailDestination(
+                icon: Icon(Icons.devices),
+                label: Text("Devices"),
+              ),
+
+              NavigationRailDestination(
+                icon: Icon(Icons.warning),
+                label: Text("Incidents"),
+              ),
+
+              NavigationRailDestination(
+                icon: Icon(Icons.notifications),
+                label: Text("Notifications"),
+              ),
+
+              NavigationRailDestination(
+                icon: Icon(Icons.list_alt),
+                label: Text("Audit"),
+              ),
+
+              NavigationRailDestination(
+                icon: Icon(Icons.analytics),
+                label: Text("Metrics"),
               ),
 
             ],

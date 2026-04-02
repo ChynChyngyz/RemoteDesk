@@ -14,6 +14,7 @@ from ticketComment import views as views_ticketComment
 from remote import views as views_remote
 from notifications import views as views_notifications
 from audit import views as views_audit
+from metricSample import views as views_metricSample
 
 
 urlpatterns = [
@@ -77,6 +78,11 @@ urlpatterns = [
     # Audit
     path("audit/", views_audit.AuditEventViewSet.as_view({"get": "list"})),
     path("audit/<int:pk>/", views_audit.AuditEventViewSet.as_view({'get': 'retrieve'})),
+
+    # Metrics
+    path("metrics/", views_metricSample.MetricSampleViewSet.as_view({"get": "list"})),
+    path("metrics/<int:pk>/", views_metricSample.MetricSampleViewSet.as_view({'get': 'retrieve'})),
+
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

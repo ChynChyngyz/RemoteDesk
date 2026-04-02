@@ -24,6 +24,9 @@ class TicketCommentsView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False) or not self.request.user.is_authenticated:
+            return self.serializer_class.Meta.model.objects.none() if hasattr(self, 'serializer_class') and hasattr(self.serializer_class, 'Meta') else []
+
         ticket_id = self.kwargs["pk"]
         return TicketComment.objects.filter(
             ticket_id=ticket_id,

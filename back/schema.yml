@@ -1,0 +1,1796 @@
+openapi: 3.0.3
+info:
+  title: Remote Desktop
+  version: 1.0.0
+  description: Remote DEsktop
+paths:
+  /api/v1/agent/heartbeat/:
+    post:
+      operationId: api_v1_agent_heartbeat_create
+      tags:
+      - Agent
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HeartbeatResponse'
+          description: ''
+  /api/v1/agent/login_agent/:
+    post:
+      operationId: api_v1_agent_login_agent_create
+      tags:
+      - Agent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentLoginRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AgentLoginRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AgentLoginRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentLoginResponse'
+          description: ''
+  /api/v1/agent/metrics/batch/:
+    post:
+      operationId: api_v1_agent_metrics_batch_create
+      tags:
+      - Agent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MetricSampleBatchRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MetricSampleBatchRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MetricSampleBatchRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsResponse'
+          description: ''
+  /api/v1/agent/register/:
+    post:
+      operationId: api_v1_agent_register_create
+      tags:
+      - Agent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentRegisterRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AgentRegisterRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AgentRegisterRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentRegisterResponse'
+          description: ''
+  /api/v1/auth/generate_agent_token/:
+    post:
+      operationId: api_v1_auth_generate_agent_token_create
+      description: |-
+        Временный endpoint для генерации токена агента
+        OrgAdmin создает токен для регистрации нового устройства.
+      tags:
+      - Users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/login/:
+    post:
+      operationId: api_v1_auth_login_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhoneLogin'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PhoneLogin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PhoneLogin'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhoneLogin'
+          description: ''
+  /api/v1/auth/logout/:
+    post:
+      operationId: api_v1_auth_logout_create
+      tags:
+      - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Logout'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Logout'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Logout'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/me/:
+    get:
+      operationId: api_v1_auth_me_retrieve
+      tags:
+      - Users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/v1/auth/token/refresh/:
+    post:
+      operationId: api_v1_auth_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/v1/orgs/alert-rules/:
+    get:
+      operationId: api_v1_orgs_alert_rules_list
+      tags:
+      - Alert
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AlertSerializers'
+          description: ''
+    post:
+      operationId: api_v1_orgs_alert_rules_create
+      tags:
+      - Alert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlertSerializers'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AlertSerializers'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AlertSerializers'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertSerializers'
+          description: ''
+  /api/v1/orgs/alert-rules/{id}/:
+    get:
+      operationId: api_v1_orgs_alert_rules_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Alert
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertSerializers'
+          description: ''
+    put:
+      operationId: api_v1_orgs_alert_rules_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Alert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlertSerializers'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AlertSerializers'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AlertSerializers'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertSerializers'
+          description: ''
+    patch:
+      operationId: api_v1_orgs_alert_rules_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Alert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAlertSerializers'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAlertSerializers'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAlertSerializers'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertSerializers'
+          description: ''
+    delete:
+      operationId: api_v1_orgs_alert_rules_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Alert
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/orgs/audit/:
+    get:
+      operationId: api_v1_orgs_audit_list
+      tags:
+      - Audit
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditEvent'
+          description: ''
+  /api/v1/orgs/audit/{id}/:
+    get:
+      operationId: api_v1_orgs_audit_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Audit
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditEvent'
+          description: ''
+  /api/v1/orgs/devices/:
+    get:
+      operationId: api_v1_orgs_devices_list
+      parameters:
+      - in: query
+        name: last_seen_at
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: status
+        schema:
+          type: string
+      tags:
+      - Devices
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Devices'
+          description: ''
+    post:
+      operationId: api_v1_orgs_devices_create
+      tags:
+      - Devices
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Devices'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Devices'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Devices'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Devices'
+          description: ''
+  /api/v1/orgs/incidents/:
+    get:
+      operationId: api_v1_orgs_incidents_list
+      tags:
+      - Incident
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IncidentSerializers'
+          description: ''
+  /api/v1/orgs/incidents/{id}/:
+    get:
+      operationId: api_v1_orgs_incidents_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Incident
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentSerializers'
+          description: ''
+    patch:
+      operationId: api_v1_orgs_incidents_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Incident
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedIncidentSerializers'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedIncidentSerializers'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedIncidentSerializers'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentSerializers'
+          description: ''
+  /api/v1/orgs/metrics/:
+    get:
+      operationId: api_v1_orgs_metrics_list
+      description: API endpoint that allows MetricSamples to be viewed by Admins.
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdminMetricSample'
+          description: ''
+  /api/v1/orgs/metrics/{id}/:
+    get:
+      operationId: api_v1_orgs_metrics_retrieve
+      description: API endpoint that allows MetricSamples to be viewed by Admins.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminMetricSample'
+          description: ''
+  /api/v1/orgs/notifications/:
+    get:
+      operationId: api_v1_orgs_notifications_list
+      tags:
+      - Notifications
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/v1/orgs/notifications/{id}/:
+    patch:
+      operationId: api_v1_orgs_notifications_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Notifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedNotification'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedNotification'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedNotification'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/v1/orgs/organizations/:
+    post:
+      operationId: api_v1_orgs_organizations_create
+      tags:
+      - Organization
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Organization'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Organization'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Organization'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+          description: ''
+  /api/v1/orgs/organizations/{id}/:
+    get:
+      operationId: api_v1_orgs_organizations_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Organization
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+          description: ''
+    put:
+      operationId: api_v1_orgs_organizations_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Organization
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Organization'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Organization'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Organization'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+          description: ''
+    delete:
+      operationId: api_v1_orgs_organizations_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Organization
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/orgs/remote-session/request:
+    post:
+      operationId: api_v1_orgs_remote_session_request_create
+      tags:
+      - Remote Assist
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                message: Remote session requested
+          description: ''
+  /api/v1/orgs/tickets/:
+    get:
+      operationId: api_v1_orgs_tickets_list
+      tags:
+      - Tickets
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TicketSerializers'
+          description: ''
+    post:
+      operationId: api_v1_orgs_tickets_create
+      tags:
+      - Tickets
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketSerializers'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TicketSerializers'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TicketSerializers'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketSerializers'
+          description: ''
+  /api/v1/orgs/tickets/{id}/:
+    get:
+      operationId: api_v1_orgs_tickets_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Tickets
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketSerializers'
+          description: ''
+    patch:
+      operationId: api_v1_orgs_tickets_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Tickets
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTicketSerializers'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTicketSerializers'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTicketSerializers'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketSerializers'
+          description: ''
+    delete:
+      operationId: api_v1_orgs_tickets_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Tickets
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/orgs/tickets/{id}/comments/:
+    get:
+      operationId: api_v1_orgs_tickets_comments_list
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Ticket Comments
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TicketCommentSerializers'
+          description: ''
+    post:
+      operationId: api_v1_orgs_tickets_comments_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Ticket Comments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketCommentSerializers'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TicketCommentSerializers'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TicketCommentSerializers'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketCommentSerializers'
+          description: ''
+  /api/v1/orgs/users/:
+    get:
+      operationId: api_v1_orgs_users_list
+      tags:
+      - Organization Users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrgUser'
+          description: ''
+    post:
+      operationId: api_v1_orgs_users_create
+      tags:
+      - Organization Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrgUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrgUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrgUser'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrgUser'
+          description: ''
+  /api/v1/orgs/users/{id}:
+    get:
+      operationId: api_v1_orgs_users_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Organization Users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrgUser'
+          description: ''
+    put:
+      operationId: api_v1_orgs_users_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Organization Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrgUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrgUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrgUser'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrgUser'
+          description: ''
+    delete:
+      operationId: api_v1_orgs_users_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Organization Users
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/schema/:
+    get:
+      operationId: api_v1_schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - ckb
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+components:
+  schemas:
+    AdminMetricSample:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        ts:
+          type: string
+          format: date-time
+        cpu_pct:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        ram_pct:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        disk_free_gb:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        uptime_sec:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        device:
+          type: integer
+      required:
+      - cpu_pct
+      - device
+      - disk_free_gb
+      - id
+      - ram_pct
+      - ts
+      - uptime_sec
+    AgentLoginRequest:
+      type: object
+      properties:
+        agent_key:
+          type: string
+      required:
+      - agent_key
+    AgentLoginResponse:
+      type: object
+      properties:
+        device_id:
+          type: integer
+        hostname:
+          type: string
+        organization:
+          type: string
+        status:
+          type: string
+        role:
+          type: string
+      required:
+      - device_id
+      - hostname
+      - organization
+      - role
+      - status
+    AgentRegisterRequest:
+      type: object
+      properties:
+        org_token:
+          type: string
+        hostname:
+          type: string
+        os:
+          type: string
+        os_version:
+          type: string
+        serial:
+          type: string
+        ip:
+          type: string
+        agent_version:
+          type: string
+          default: 0.0.1
+      required:
+      - hostname
+      - ip
+      - org_token
+      - os
+      - os_version
+      - serial
+    AgentRegisterResponse:
+      type: object
+      properties:
+        device_id:
+          type: integer
+        hostname:
+          type: string
+        organization:
+          type: string
+        agent_key:
+          type: string
+      required:
+      - agent_key
+      - device_id
+      - hostname
+      - organization
+    AlertSerializers:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        organization:
+          type: integer
+          readOnly: true
+        metric:
+          $ref: '#/components/schemas/MetricEnum'
+        operator:
+          $ref: '#/components/schemas/OperatorEnum'
+        threshold:
+          type: number
+          format: double
+        duration_sec:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        severity:
+          $ref: '#/components/schemas/SeverityEnum'
+        is_active:
+          type: boolean
+      required:
+      - duration_sec
+      - id
+      - metric
+      - operator
+      - organization
+      - severity
+      - threshold
+    AuditEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        organization:
+          type: integer
+          readOnly: true
+        actor_user:
+          type: integer
+          readOnly: true
+          nullable: true
+        actor_device:
+          type: integer
+          readOnly: true
+          nullable: true
+        type:
+          type: string
+          readOnly: true
+        metadata_json:
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - actor_device
+      - actor_user
+      - created_at
+      - id
+      - metadata_json
+      - organization
+      - type
+    Devices:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        organization:
+          type: integer
+          readOnly: true
+        hostname:
+          type: string
+          maxLength: 255
+        os:
+          type: string
+          maxLength: 100
+        os_version:
+          type: string
+          maxLength: 100
+        serial:
+          type: string
+          maxLength: 255
+        ip:
+          type: string
+        last_seen_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        status:
+          type: string
+          maxLength: 20
+        agent_version:
+          type: string
+          maxLength: 50
+      required:
+      - agent_version
+      - hostname
+      - id
+      - ip
+      - last_seen_at
+      - organization
+      - os
+      - os_version
+      - serial
+      - status
+    HeartbeatResponse:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+      - status
+    IncidentSerializers:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        organization:
+          type: integer
+          readOnly: true
+        device:
+          type: integer
+          readOnly: true
+        rule:
+          type: integer
+          readOnly: true
+        opened_at:
+          type: string
+          format: date-time
+          readOnly: true
+        resolved_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        severity:
+          allOf:
+          - $ref: '#/components/schemas/SeverityEnum'
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/IncidentSerializersStatusEnum'
+        last_event_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - device
+      - id
+      - last_event_at
+      - opened_at
+      - organization
+      - resolved_at
+      - rule
+      - severity
+    IncidentSerializersStatusEnum:
+      enum:
+      - OPEN
+      - ACKNOWLEDGED
+      - RESOLVED
+      type: string
+      description: |-
+        * `OPEN` - Open
+        * `ACKNOWLEDGED` - Acknowledged
+        * `RESOLVED` - Resolved
+    Logout:
+      type: object
+      properties:
+        refresh:
+          type: string
+      required:
+      - refresh
+    MetricEnum:
+      enum:
+      - cpu_pct
+      - ram_pct
+      - disk_free_gb
+      - uptime_sec
+      type: string
+      description: |-
+        * `cpu_pct` - CPU Usage (%)
+        * `ram_pct` - RAM Usage (%)
+        * `disk_free_gb` - Disk Free (GB)
+        * `uptime_sec` - Uptime (Seconds)
+    MetricSample:
+      type: object
+      properties:
+        ts:
+          type: string
+          format: date-time
+        cpu_pct:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        ram_pct:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        disk_free_gb:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        uptime_sec:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+      required:
+      - cpu_pct
+      - disk_free_gb
+      - ram_pct
+      - ts
+      - uptime_sec
+    MetricSampleBatchRequest:
+      type: object
+      properties:
+        agent_key:
+          type: string
+        metrics:
+          type: array
+          items:
+            $ref: '#/components/schemas/MetricSample'
+      required:
+      - metrics
+    MetricsResponse:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+      - status
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        type:
+          type: string
+          readOnly: true
+        payload_json:
+          readOnly: true
+        read_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - payload_json
+      - type
+      - user
+    OperatorEnum:
+      enum:
+      - '>'
+      - <
+      - '>='
+      - <=
+      - ==
+      type: string
+      description: |-
+        * `>` - Greater than
+        * `<` - Less than
+        * `>=` - Greater or equal
+        * `<=` - Less or equal
+        * `==` - Equal
+    OrgUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        phone:
+          type: string
+          maxLength: 20
+        password:
+          type: string
+          writeOnly: true
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        organization:
+          allOf:
+          - $ref: '#/components/schemas/Organization'
+          readOnly: true
+      required:
+      - id
+      - organization
+      - password
+      - phone
+    Organization:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        city:
+          type: string
+          maxLength: 255
+        industry:
+          type: string
+          maxLength: 255
+        is_active:
+          type: boolean
+      required:
+      - city
+      - id
+      - industry
+      - name
+    PatchedAlertSerializers:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        organization:
+          type: integer
+          readOnly: true
+        metric:
+          $ref: '#/components/schemas/MetricEnum'
+        operator:
+          $ref: '#/components/schemas/OperatorEnum'
+        threshold:
+          type: number
+          format: double
+        duration_sec:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        severity:
+          $ref: '#/components/schemas/SeverityEnum'
+        is_active:
+          type: boolean
+    PatchedIncidentSerializers:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        organization:
+          type: integer
+          readOnly: true
+        device:
+          type: integer
+          readOnly: true
+        rule:
+          type: integer
+          readOnly: true
+        opened_at:
+          type: string
+          format: date-time
+          readOnly: true
+        resolved_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        severity:
+          allOf:
+          - $ref: '#/components/schemas/SeverityEnum'
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/IncidentSerializersStatusEnum'
+        last_event_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedNotification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        type:
+          type: string
+          readOnly: true
+        payload_json:
+          readOnly: true
+        read_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedTicketSerializers:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        organization:
+          type: integer
+        device:
+          type: integer
+          nullable: true
+        incident:
+          type: integer
+          nullable: true
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/TicketSerializersStatusEnum'
+        priority:
+          $ref: '#/components/schemas/PriorityEnum'
+        assignee_user:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        closed_at:
+          type: string
+          format: date-time
+          nullable: true
+    PhoneLogin:
+      type: object
+      properties:
+        phone:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - password
+      - phone
+    PriorityEnum:
+      enum:
+      - low
+      - medium
+      - high
+      type: string
+      description: |-
+        * `low` - Low
+        * `medium` - Medium
+        * `high` - High
+    RoleEnum:
+      enum:
+      - OrgAdmin
+      - Technician
+      - ClientViewer
+      type: string
+      description: |-
+        * `OrgAdmin` - OrgAdmin
+        * `Technician` - Technician
+        * `ClientViewer` - ClientViewer
+    SeverityEnum:
+      enum:
+      - low
+      - medium
+      - high
+      - critical
+      type: string
+      description: |-
+        * `low` - Low
+        * `medium` - Medium
+        * `high` - High
+        * `critical` - Critical
+    TicketCommentSerializers:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        ticket:
+          type: integer
+          readOnly: true
+        author:
+          type: integer
+          readOnly: true
+        body:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - author
+      - body
+      - created_at
+      - id
+      - ticket
+    TicketSerializers:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        organization:
+          type: integer
+        device:
+          type: integer
+          nullable: true
+        incident:
+          type: integer
+          nullable: true
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/TicketSerializersStatusEnum'
+        priority:
+          $ref: '#/components/schemas/PriorityEnum'
+        assignee_user:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        closed_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - created_at
+      - description
+      - id
+      - organization
+      - priority
+      - status
+      - title
+    TicketSerializersStatusEnum:
+      enum:
+      - open
+      - in_progress
+      - closed
+      type: string
+      description: |-
+        * `open` - Open
+        * `in_progress` - In Progress
+        * `closed` - Closed
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          writeOnly: true
+      required:
+      - access
+      - refresh
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        phone:
+          type: string
+          maxLength: 20
+        password:
+          type: string
+          writeOnly: true
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        organization:
+          allOf:
+          - $ref: '#/components/schemas/Organization'
+          readOnly: true
+      required:
+      - id
+      - organization
+      - password
+      - phone
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

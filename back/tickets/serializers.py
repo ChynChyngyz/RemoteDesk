@@ -12,3 +12,13 @@ class TicketSerializers(serializers.ModelSerializer):
             'description', 'status', 'priority', 'assignee_user',
             'created_at', 'closed_at'
         ]
+
+        read_only_fields = [
+            'id',
+            'organization',
+            'device',
+            'incident',
+            'assignee_user',
+            'created_at',
+            'closed_at'
+        ]
