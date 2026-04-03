@@ -10,9 +10,6 @@ from agent.models import AgentKey
 from orgs.models import Organization
 from authUser.models import CustomUser
 
-# ------------------------
-# Remote Assist
-# ------------------------
 
 class RemoteSessionRequestView(APIView):
 

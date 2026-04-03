@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: remote_desk_db
+      POSTGRES_USER: db_user
+      POSTGRES_PASSWORD: secret_password
+    # ports: удалено для безопасности!
+
+  backend:
+    build:
+      context: ./backend
+    restart: always
+    command: >
+      bash -c "python manage.py migrate --noinput &&
+               gunicorn --bind 0.0.0.0:8000 back.wsgi:application"
+    # volumes: удалено для продакшена
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_NAME=remote_desk_db
+      - DB_USER=db_user
+      - DB_PASSWORD=secret_password
+      - DB_HOST=db
+      - DB_PORT=5432
+      - SECRET_KEY=your_django_secret_key
+      - DEBUG=False
+    depends_on:
+      - db
+
+  coturn:
+    image: coturn/coturn:latest
+    restart: always
+    network_mode: "host"
+    volumes:
+      - ./turnserver.conf:/etc/coturn/turnserver.conf
+    # network_mode "host" позволяет использовать порты самой ВМ напрямую.
+    # В GCP Firewall нужно будет открыть UDP порты 49152-65535 и TCP/UDP 3478.
+
+volumes:
+  postgres_data:

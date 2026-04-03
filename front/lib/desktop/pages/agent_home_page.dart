@@ -191,7 +191,7 @@ class _AnyDeskPageState extends State<AnyDeskPage> {
       MaterialPageRoute(
         builder: (_) => RemoteSessionPage(
           remoteId: "test",
-          isTechnician: false,
+          isTechnician: true,
         ),
       ),
     );

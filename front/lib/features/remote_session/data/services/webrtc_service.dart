@@ -1,6 +1,7 @@
 // features/auth/remote_session/data/services/webrtc_service.dart
 
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -16,17 +17,27 @@ class WebRTCService {
     'iceServers': [
       {'urls': 'stun:stun.l.google.com:19302'},
       {'urls': 'stun:stun1.l.google.com:19302'},
-      {'urls': 'stun:stun2.l.google.com:19302'},
-      // {'urls': 'turn:stun.l.google.com:19302'},
-      // {},
-      // {},
-    ]
+      // {
+      //   'urls': 'turn::3478',
+      //   'username': '',
+      //   'credential': '',
+      // },
+    ],
+    // 'iceTransportPolicy': 'all',
   };
 
   Future<void> connect(String room) async {
     _channel = WebSocketChannel.connect(Uri.parse("ws://localhost:8000/ws/signal/$room/"));
 
     _peerConnection = await createPeerConnection(_config);
+
+    _peerConnection!.onIceConnectionState = (RTCIceConnectionState state) {
+      debugPrint("ICE Connection State: $state");
+      if (state == RTCIceConnectionState.RTCIceConnectionStateFailed ||
+          state == RTCIceConnectionState.RTCIceConnectionStateDisconnected) {
+        debugPrint("Соединение прервано или заблокировано фаерволом.");
+      }
+    };
 
     await _peerConnection!.addTransceiver(
       kind: RTCRtpMediaType.RTCRtpMediaTypeVideo,
@@ -40,7 +51,9 @@ class WebRTCService {
     };
 
     _peerConnection!.onTrack = (event) {
-      remoteRenderer.srcObject = event.streams[0];
+      if (event.streams.isNotEmpty) {
+        remoteRenderer.srcObject = event.streams[0];
+      }
     };
 
     _channel.stream.listen((message) async {
@@ -56,11 +69,13 @@ class WebRTCService {
           await _peerConnection!.setRemoteDescription(RTCSessionDescription(data["sdp"], "answer"));
           break;
         case "candidate":
-          await _peerConnection!.addCandidate(RTCIceCandidate(
-            data["candidate"]["candidate"],
-            data["candidate"]["sdpMid"],
-            data["candidate"]["sdpMLineIndex"],
-          ));
+          if (data["candidate"] != null) {
+            await _peerConnection!.addCandidate(RTCIceCandidate(
+              data["candidate"]["candidate"],
+              data["candidate"]["sdpMid"],
+              data["candidate"]["sdpMLineIndex"],
+            ));
+          }
           break;
       }
     });
