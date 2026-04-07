@@ -1,7 +1,9 @@
+// desktop/pages/admin/metric_sample.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../features/metric_sample/presentation/bloc/metric_sample_cubit.dart';
-import '../../../features/metric_sample/presentation/bloc/metric_sample_state.dart';
+import 'package:front/features/metric_sample/presentation/bloc/metric_sample_cubit.dart';
+import 'package:front/features/metric_sample/presentation/bloc/metric_sample_state.dart';
 
 class MetricSamplePage extends StatefulWidget {
   final int orgId;

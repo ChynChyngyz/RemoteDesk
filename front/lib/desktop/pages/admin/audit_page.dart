@@ -1,7 +1,9 @@
+// desktop/pages/admin/audit_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../features/audit/presentation/bloc/audit_cubit.dart';
-import '../../../features/audit/presentation/bloc/audit_state.dart';
+import 'package:front/features/audit/presentation/bloc/audit_cubit.dart';
+import 'package:front/features/audit/presentation/bloc/audit_state.dart';
 
 class AuditEventPage extends StatefulWidget {
   final int orgId;

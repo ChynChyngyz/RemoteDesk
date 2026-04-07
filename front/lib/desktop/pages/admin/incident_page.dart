@@ -1,7 +1,9 @@
+// desktop/pages/admin/incident_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../features/incident/presentation/bloc/incident_cubit.dart';
-import '../../../features/incident/presentation/bloc/incident_state.dart';
+import 'package:front/features/incident/presentation/bloc/incident_cubit.dart';
+import 'package:front/features/incident/presentation/bloc/incident_state.dart';
 
 class IncidentPage extends StatefulWidget {
   final int orgId;

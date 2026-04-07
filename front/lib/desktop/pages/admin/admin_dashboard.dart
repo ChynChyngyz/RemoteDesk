@@ -1,6 +1,7 @@
 // desktop/pages/admin/admin_dashboard.dart
 
 import 'package:flutter/material.dart';
+import 'admin_overview_page.dart';
 import 'agent_token_page.dart';
 import 'organization_page.dart';
 import 'users_page.dart';
@@ -10,6 +11,8 @@ import 'incident_page.dart';
 import 'notification_page.dart';
 import 'audit_page.dart';
 import 'metric_sample_page.dart';
+import 'package:front/desktop/widgets/nexus_sidebar.dart';
+import 'package:front/core/theme/app_theme.dart';
 
 class AdminDashboard extends StatefulWidget {
   final int orgId;
@@ -34,6 +37,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     super.initState();
 
     pages = [
+      const AdminOverviewPage(),
       OrganizationPage(orgId: widget.orgId),
       UsersPage(orgId: widget.orgId),
       const AgentTokenPage(),
@@ -50,73 +54,32 @@ class _AdminDashboardState extends State<AdminDashboard> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-
+      backgroundColor: AppTheme.bgDark,
       body: Row(
         children: [
-
-          NavigationRail(
+          NexusSidebar(
             selectedIndex: index,
-            onDestinationSelected: (i){
+            onItemSelected: (i) {
               setState(() => index = i);
             },
-            labelType: NavigationRailLabelType.all,
-            destinations: const [
-
-              NavigationRailDestination(
-                icon: Icon(Icons.business),
-                label: Text("Organization"),
-              ),
-
-              NavigationRailDestination(
-                icon: Icon(Icons.people),
-                label: Text("Users"),
-              ),
-
-              NavigationRailDestination(
-                icon: Icon(Icons.vpn_key),
-                label: Text("Agent Token"),
-              ),
-
-              NavigationRailDestination(
-                icon: Icon(Icons.confirmation_number),
-                label: Text("Tickets"),
-              ),
-
-              NavigationRailDestination(
-                icon: Icon(Icons.devices),
-                label: Text("Devices"),
-              ),
-
-              NavigationRailDestination(
-                icon: Icon(Icons.warning),
-                label: Text("Incidents"),
-              ),
-
-              NavigationRailDestination(
-                icon: Icon(Icons.notifications),
-                label: Text("Notifications"),
-              ),
-
-              NavigationRailDestination(
-                icon: Icon(Icons.list_alt),
-                label: Text("Audit"),
-              ),
-
-              NavigationRailDestination(
-                icon: Icon(Icons.analytics),
-                label: Text("Metrics"),
-              ),
-
+            items: [
+              NexusSidebarItem(icon: Icons.dashboard_outlined, label: "Overview"),
+              NexusSidebarItem(icon: Icons.business, label: "Organization"),
+              NexusSidebarItem(icon: Icons.people, label: "Users"),
+              NexusSidebarItem(icon: Icons.vpn_key, label: "Agent Token"),
+              NexusSidebarItem(icon: Icons.confirmation_number, label: "Tickets"),
+              NexusSidebarItem(icon: Icons.devices, label: "Devices"),
+              NexusSidebarItem(icon: Icons.warning, label: "Incidents"),
+              NexusSidebarItem(icon: Icons.notifications, label: "Notifications"),
+              NexusSidebarItem(icon: Icons.list_alt, label: "Audit"),
+              NexusSidebarItem(icon: Icons.analytics, label: "Metrics"),
             ],
           ),
-
           Expanded(
             child: pages[index],
           )
-
         ],
       ),
-
     );
   }
 }

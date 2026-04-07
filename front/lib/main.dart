@@ -25,6 +25,7 @@ import 'package:front/features/metric_sample/presentation/bloc/metric_sample_cub
 import 'package:front/features/client_portal/presentation/bloc/client_devices_bloc.dart';
 
 import 'package:front/features/auth/presentation/pages/login_page.dart';
+import 'package:front/core/theme/app_theme.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -100,39 +101,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Remote Desktop',
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.blue.shade700,
-            background: const Color(0xFFF4F7FC),
-          ),
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black87,
-            elevation: 1,
-            shadowColor: Colors.black12,
-            centerTitle: false,
-          ),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          ),
-          dataTableTheme: DataTableThemeData(
-            headingRowColor: MaterialStateProperty.all(Colors.grey.shade50),
-            headingTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
-            dataRowColor: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
-              if (states.contains(MaterialState.selected)) {
-                return Colors.blue.withOpacity(0.08);
-              }
-              return Colors.white;
-            }),
-          ),
-        ),
+        theme: AppTheme.darkTheme,
         home: const LoginPage(),
       ),
     );

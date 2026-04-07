@@ -1,10 +1,14 @@
 // features/client_portal/presentation/pages/client_devices_page.dart
 
+import 'package:intl/intl.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
+
 import 'package:front/features/client_portal/presentation/bloc/client_devices_bloc.dart';
 import 'package:front/features/client_portal/domain/entities/device_entity.dart';
+import 'package:front/core/theme/app_theme.dart';
+import 'package:front/desktop/widgets/glass_panel.dart';
 
 class ClientDevicesPage extends StatelessWidget {
   const ClientDevicesPage({super.key});
@@ -12,18 +16,17 @@ class ClientDevicesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F7FC),
+      backgroundColor: AppTheme.bgDark,
       appBar: AppBar(
         title: const Text(
           "My Organization Devices",
-          style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black87),
+          style: TextStyle(fontWeight: FontWeight.w600, color: AppTheme.textMain),
         ),
-        backgroundColor: Colors.white,
-        elevation: 1,
-        shadowColor: Colors.black12,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.black54),
+            icon: const Icon(Icons.refresh, color: AppTheme.textMuted),
             onPressed: () {
               context.read<ClientDevicesBloc>().add(const FetchClientDevices());
             },
@@ -56,10 +59,15 @@ class ClientDevicesPage extends StatelessWidget {
   }
 
   Widget _buildDevicesList(List<DeviceEntity> devices) {
-    return ListView.separated(
-      padding: const EdgeInsets.all(24.0),
+    return GridView.builder(
+      padding: const EdgeInsets.all(32.0),
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 380,
+        mainAxisSpacing: 32,
+        crossAxisSpacing: 32,
+        childAspectRatio: 0.85,
+      ),
       itemCount: devices.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final device = devices[index];
         return _DeviceCard(device: device);
@@ -126,110 +134,100 @@ class _DeviceCard extends StatelessWidget {
         ? Colors.green.shade50
         : (isWarning ? Colors.amber.shade50 : Colors.grey.shade100);
 
-    return InkWell(
-      onTap: () {
-        // TODO: Переход на страницу деталей с графиками метрик (FR-040)
-      },
-      borderRadius: BorderRadius.circular(12),
-      child: Ink(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.02),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            )
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.blue.shade50,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.desktop_windows, color: Colors.blue.shade700),
-            ),
-            const SizedBox(width: 20),
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    device.hostname,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    device.os,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: statusBgColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: statusColor,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        device.status,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: statusColor,
-                        ),
-                      ),
-                    ],
-                  ),
+    return GlassPanel(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  device.lastSeenAt != null
-                      ? "Last seen: ${DateFormat('MMM dd, HH:mm').format(device.lastSeenAt!)}"
-                      : "Never connected",
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey.shade500,
-                  ),
+                child: const Icon(Icons.desktop_windows, color: AppTheme.primary, size: 32),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: statusBgColor,
+                  borderRadius: BorderRadius.circular(20),
                 ),
-              ],
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: statusColor,
+                        shape: BoxShape.circle,
+                        boxShadow: isOnline ? [BoxShadow(color: statusColor.withOpacity(0.5), blurRadius: 4)] : null,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      device.status,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: statusColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Text(
+            device.hostname,
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.textMain,
             ),
-
-            const SizedBox(width: 16),
-            Icon(Icons.chevron_right, color: Colors.grey.shade400),
-          ],
-        ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            device.os,
+            style: const TextStyle(
+              fontSize: 15,
+              color: AppTheme.textMuted,
+            ),
+          ),
+          const Spacer(),
+          Center(
+            child: Text(
+              device.lastSeenAt != null
+                  ? "Last seen: ${DateFormat('MMM dd, HH:mm').format(device.lastSeenAt!)}"
+                  : "Never connected",
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppTheme.textMuted,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            height: 50,
+            child: ElevatedButton.icon(
+              onPressed: isOnline ? () {} : null,
+              icon: const Icon(Icons.bolt),
+              label: const Text("Connect Now"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isOnline ? null : AppTheme.panelBg,
+                foregroundColor: isOnline ? null : AppTheme.textMuted,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

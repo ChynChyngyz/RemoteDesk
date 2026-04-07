@@ -1,7 +1,9 @@
+// desktop/pages/admin/device_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../features/device/presentation/bloc/device_cubit.dart';
-import '../../../features/device/presentation/bloc/device_state.dart';
+import 'package:front/features/device/presentation/bloc/device_cubit.dart';
+import 'package:front/features/device/presentation/bloc/device_state.dart';
 
 class DevicePage extends StatefulWidget {
   final int orgId;
