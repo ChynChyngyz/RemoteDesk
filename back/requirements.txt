@@ -14,3 +14,4 @@ djangorestframework-simplejwt
 drf-spectacular
 django-filter~=24.3
 channels[daphne]
+channels-redis

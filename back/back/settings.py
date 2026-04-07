@@ -164,13 +164,17 @@ SIMPLE_JWT = {
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer", # для тестов
+        # "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+        # "CONFIG": {
+        #     # "hosts": [("redis", 6379)],
+        #     "hosts": [("127.0.0.1", 6379)],
+        # },
     },
 }
-
 AUTH_USER_MODEL = 'authUser.CustomUser'
 
-ASGI_APPLICATION = 'back.asgi.application'
+ASGI_APPLICATION = 'back.routing.application'
 
 WSGI_APPLICATION = 'back.wsgi.application'
 

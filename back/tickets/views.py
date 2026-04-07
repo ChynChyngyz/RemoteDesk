@@ -8,7 +8,7 @@ from drf_spectacular.utils import extend_schema_view, extend_schema
 
 from .models import Ticket
 from .serializers import TicketSerializers
-
+#
 
 @extend_schema_view(
     list=extend_schema(tags=['Tickets']),

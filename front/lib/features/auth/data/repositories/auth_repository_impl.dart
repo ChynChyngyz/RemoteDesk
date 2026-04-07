@@ -77,5 +77,8 @@ class AuthRepositoryImpl implements IAuthRepository {
 
     }
   }
-
+  @override
+  Future<String?> getAccessToken() async {
+    return await _storage.read(key: "access");
+  }
 }

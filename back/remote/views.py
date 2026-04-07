@@ -1,14 +1,23 @@
+import uuid
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+
 from drf_spectacular.utils import extend_schema
 
-from notifications.models import Notification
 from .models import RemoteSession
+from .turn import generate_turn_credentials
+
 from devices.models import Device
 from agent.models import AgentKey
 from orgs.models import Organization
 from authUser.models import CustomUser
+from notifications.models import Notification
+
+
+class TurnCredentialsView(APIView):
+    def get(self, request):
+        return Response(generate_turn_credentials())
 
 
 class RemoteSessionRequestView(APIView):
@@ -25,10 +34,14 @@ class RemoteSessionRequestView(APIView):
             device_id=request.data.get("device"),
             requester_user=request.user,
             status="pending",
-            consent_method="manual"
+            consent_method="manual",
+            access_token=str(uuid.uuid4())
         )
 
-        return Response({"session_id": session.id}, status=201)
+        return Response({
+            "session_id": session.id,
+            "access_token": session.access_token
+        }, status=201)
 
 
 class RemoteSessionApproveView(APIView):

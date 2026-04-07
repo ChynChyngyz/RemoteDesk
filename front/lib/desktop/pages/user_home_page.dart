@@ -10,6 +10,8 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:front/features/tickets/presentation/bloc/ticket_cubit.dart';
 import 'package:front/features/tickets/presentation/bloc/ticket_state.dart';
+import 'package:front/features/auth/presentation/bloc/auth_cubit.dart';
+import 'package:front/features/auth/presentation/bloc/auth_state.dart';
 
 class UserHomePage extends StatefulWidget {
   const UserHomePage({super.key});
@@ -64,19 +66,35 @@ class _UserHomePageState extends State<UserHomePage> {
     }
   }
 
-  void _handleConnect() {
+void _handleConnect() async {
     final remoteId = deviceId.trim();
     if (remoteId.isEmpty || remoteId == "Fetching...") return;
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => RemoteSessionPage(
-          remoteId: remoteId,
-          isTechnician: false,
+    final authState = context.read<AuthCubit>().state;
+
+    if (authState is AuthAuthenticated) {
+      final myJwtToken = authState.jwtToken;
+
+      final sessionToken = "token_from_backend";
+
+      if (!mounted) return;
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => RemoteSessionPage(
+            remoteId: remoteId,
+            sessionToken: sessionToken,
+            jwtToken: myJwtToken,
+            isTechnician: false,
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Error: User not authenticated")),
+      );
+    }
   }
 
   void _createNewTicketDialog() {

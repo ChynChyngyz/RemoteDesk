@@ -10,24 +10,38 @@ class WebRTCService {
   MediaStream? _localStream;
   late WebSocketChannel _channel;
   final RTCVideoRenderer remoteRenderer;
+  final VoidCallback? onStreamReceived;
+  final List<RTCIceCandidate> _remoteCandidatesQueue = [];
 
-  WebRTCService(this.remoteRenderer);
+  WebRTCService(this.remoteRenderer, {this.onStreamReceived});
 
   final Map<String, dynamic> _config = {
     'iceServers': [
       {'urls': 'stun:stun.l.google.com:19302'},
       {'urls': 'stun:stun1.l.google.com:19302'},
-      // {
-      //   'urls': 'turn::3478',
-      //   'username': '',
-      //   'credential': '',
-      // },
     ],
-    // 'iceTransportPolicy': 'all',
   };
 
-  Future<void> connect(String room) async {
-    _channel = WebSocketChannel.connect(Uri.parse("ws://localhost:8000/ws/signal/$room/"));
+  Future<void> connect({
+    required String room,
+    required String sessionToken,
+    String? jwt,
+    String? agentKey,
+  }) async {
+    final uri = Uri(
+      scheme: 'ws',
+      host: '127.0.0.1',
+      port: 8000,
+      path: '/ws/signal/$room/',
+      queryParameters: {
+        'token': sessionToken,
+        if (jwt != null) 'jwt': jwt,
+        if (agentKey != null) 'agent_key': agentKey,
+      },
+    );
+
+    debugPrint("Connecting to WS: $uri");
+    _channel = WebSocketChannel.connect(uri);
 
     _peerConnection = await createPeerConnection(_config);
 
@@ -52,44 +66,110 @@ class WebRTCService {
 
     _peerConnection!.onTrack = (event) {
       if (event.streams.isNotEmpty) {
+        debugPrint("Видеопоток получен!");
         remoteRenderer.srcObject = event.streams[0];
+
+        if (onStreamReceived != null) {
+          onStreamReceived!();
+        }
       }
     };
 
     _channel.stream.listen((message) async {
-      final data = jsonDecode(message);
-      switch (data["type"]) {
-        case "offer":
-          await _peerConnection!.setRemoteDescription(RTCSessionDescription(data["sdp"], "offer"));
-          final answer = await _peerConnection!.createAnswer();
-          await _peerConnection!.setLocalDescription(answer);
-          _channel.sink.add(jsonEncode({"type": "answer", "sdp": answer.sdp}));
-          break;
-        case "answer":
-          await _peerConnection!.setRemoteDescription(RTCSessionDescription(data["sdp"], "answer"));
-          break;
-        case "candidate":
-          if (data["candidate"] != null) {
-            await _peerConnection!.addCandidate(RTCIceCandidate(
-              data["candidate"]["candidate"],
-              data["candidate"]["sdpMid"],
-              data["candidate"]["sdpMLineIndex"],
-            ));
-          }
-          break;
+      debugPrint("WS RECEIVE: ${message.substring(0, message.length > 50 ? 50 : message.length)}..."); // Сократим лог, чтобы не засорять консоль
+
+      try {
+        final data = jsonDecode(message);
+
+        switch (data["type"]) {
+          case "offer":
+            final state = _peerConnection!.signalingState;
+            if (state == RTCSignalingState.RTCSignalingStateStable || state == null) {
+              debugPrint("Handling Offer...");
+              await _peerConnection!.setRemoteDescription(RTCSessionDescription(data["sdp"], "offer"));
+              final answer = await _peerConnection!.createAnswer();
+              await _peerConnection!.setLocalDescription(answer);
+              _channel.sink.add(jsonEncode({"type": "answer", "sdp": answer.sdp}));
+
+              _processCandidatesQueue();
+            } else {
+              debugPrint("Игнорируем offer, так как state: $state");
+            }
+            break;
+
+          case "answer":
+            final state = _peerConnection!.signalingState;
+            if (state == RTCSignalingState.RTCSignalingStateHaveLocalOffer || state == null) {
+              debugPrint("Handling Answer...");
+              await _peerConnection!.setRemoteDescription(RTCSessionDescription(data["sdp"], "answer"));
+
+              _processCandidatesQueue();
+            } else {
+              debugPrint("Игнорируем дублирующийся answer, state: $state");
+            }
+            break;
+
+          case "candidate":
+            if (data["candidate"] != null) {
+              final candidate = RTCIceCandidate(
+                data["candidate"]["candidate"],
+                data["candidate"]["sdpMid"],
+                data["candidate"]["sdpMLineIndex"],
+              );
+
+              final remoteDesc = await _peerConnection!.getRemoteDescription();
+              if (remoteDesc != null) {
+                debugPrint("Adding Candidate immediately...");
+                await _peerConnection!.addCandidate(candidate);
+              } else {
+                debugPrint("Remote description is null. Queuing candidate...");
+                _remoteCandidatesQueue.add(candidate);
+              }
+            }
+            break;
+        }
+      } catch (e) {
+        debugPrint("Ошибка при обработке WebRTC сигнала: $e");
       }
     });
   }
 
-  Future<void> shareScreen() async {
-    final stream = await navigator.mediaDevices.getDisplayMedia({"video": true, "audio": false});
-    _localStream = stream;
-    for (var track in stream.getTracks()) {
-      _peerConnection!.addTrack(track, stream);
+  Future<void> _processCandidatesQueue() async {
+    if (_remoteCandidatesQueue.isNotEmpty) {
+      debugPrint("Processing ${_remoteCandidatesQueue.length} queued candidates...");
+      for (var candidate in _remoteCandidatesQueue) {
+        await _peerConnection!.addCandidate(candidate);
+      }
+      _remoteCandidatesQueue.clear();
     }
-    final offer = await _peerConnection!.createOffer({"offerToReceiveVideo": 1, "offerToReceiveAudio": 0});
-    await _peerConnection!.setLocalDescription(offer);
-    _channel.sink.add(jsonEncode({"type": "offer", "sdp": offer.sdp}));
+  }
+
+  Future<void> shareScreen() async {
+    try {
+      debugPrint("Requesting Display Media...");
+      final stream = await navigator.mediaDevices.getDisplayMedia({
+        "video": true,
+        "audio": false
+      });
+      debugPrint("Display Media Captured!");
+
+      _localStream = stream;
+      for (var track in stream.getTracks()) {
+        _peerConnection!.addTrack(track, stream);
+      }
+
+      final offer = await _peerConnection!.createOffer({
+        "offerToReceiveVideo": 1,
+        "offerToReceiveAudio": 0
+      });
+      await _peerConnection!.setLocalDescription(offer);
+
+      debugPrint("Sending Offer to Socket...");
+      _channel.sink.add(jsonEncode({"type": "offer", "sdp": offer.sdp}));
+
+    } catch (e) {
+      debugPrint("Error sharing screen: $e");
+    }
   }
 
   void dispose() {

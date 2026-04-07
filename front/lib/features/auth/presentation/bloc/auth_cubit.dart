@@ -14,7 +14,9 @@ class AuthCubit extends Cubit<AuthState> {
 
     try {
       final user = await repository.login(phone, password);
-      emit(AuthAuthenticated(user));
+      final token = await repository.getAccessToken();
+
+      emit(AuthAuthenticated(user, token ?? ''));
     } catch (e) {
       emit(AuthError(e.toString().replaceAll("Exception: ", "")));
     }
@@ -24,8 +26,10 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
 
     try {
-      final user = await repository.loginWithToken(hashToken);
-      emit(AuthAgentAuthenticated(user.role));
+      final agent = await repository.loginWithToken(hashToken);
+
+      // Передаем hashToken в состояние
+      emit(AuthAgentAuthenticated(agent.role, hashToken));
     } catch (e) {
       emit(AuthError(e.toString().replaceAll("Exception: ", "")));
     }

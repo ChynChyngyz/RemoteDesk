@@ -6,6 +6,7 @@ from authUser.models import CustomUser
 
 class RemoteSession(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    access_token = models.CharField(max_length=255, null=True, blank=True)
     device = models.ForeignKey(Device, on_delete=models.CASCADE)
     requester_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     status = models.CharField(max_length=30)

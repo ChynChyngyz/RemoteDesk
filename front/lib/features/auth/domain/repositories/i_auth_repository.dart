@@ -6,4 +6,5 @@ import 'package:front/features/auth/domain/entities/agent.dart';
 abstract class IAuthRepository {
   Future<User> login(String phone, String password);
   Future<Agent> loginWithToken(String hashToken);
+  Future<String?> getAccessToken();
 }

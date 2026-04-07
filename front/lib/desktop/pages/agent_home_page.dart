@@ -1,8 +1,12 @@
-// desktop/pages/main_page.dart
+// desktop/pages/agent_home_page.dart
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/desktop/pages/remote_view_page.dart';
+import 'package:front/features/auth/presentation/bloc/auth_cubit.dart';
+import 'package:front/features/auth/presentation/bloc/auth_state.dart';
+
 
 class AnyDeskPage extends StatefulWidget {
   const AnyDeskPage({super.key});
@@ -182,19 +186,35 @@ class _AnyDeskPageState extends State<AnyDeskPage> {
     );
   }
 
-  void _handleConnect() {
+void _handleConnect() async {
     final remoteId = _remoteIdController.text.trim();
     if (remoteId.isEmpty) return;
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => RemoteSessionPage(
-          remoteId: "test",
-          isTechnician: true,
+    final authState = context.read<AuthCubit>().state;
+
+    if (authState is AuthAgentAuthenticated) {
+      final myAgentKey = authState.agentKey;
+
+      final sessionToken = "token_from_backend";
+
+      if (!mounted) return;
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => RemoteSessionPage(
+            remoteId: remoteId,
+            sessionToken: sessionToken,
+            agentKey: myAgentKey,
+            isTechnician: true,
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Error: Agent not authenticated")),
+      );
+    }
   }
 
   Widget _buildInfoCard({

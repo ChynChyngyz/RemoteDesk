@@ -13,13 +13,15 @@ class AuthLoading extends AuthState {}
 
 class AuthAuthenticated extends AuthState {
   final User user;
-  AuthAuthenticated(this.user);
+  final String jwtToken;
+  AuthAuthenticated(this.user, this.jwtToken);
 }
 
 
 class AuthAgentAuthenticated extends AuthState {
   final String role;
-  AuthAgentAuthenticated(this.role);
+  final String agentKey;
+  AuthAgentAuthenticated(this.role, this.agentKey);
 }
 
 
