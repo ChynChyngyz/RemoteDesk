@@ -11,6 +11,7 @@ import 'package:front/features/tickets/presentation/bloc/ticket_cubit.dart';
 import 'package:front/features/tickets/presentation/bloc/ticket_state.dart';
 import 'package:front/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:front/features/auth/presentation/bloc/auth_state.dart';
+import 'package:front/features/auth/presentation/pages/login_page.dart';
 import 'package:front/core/theme/app_theme.dart';
 import 'package:front/desktop/widgets/glass_panel.dart';
 import 'package:front/desktop/widgets/nexus_sidebar.dart';
@@ -193,6 +194,13 @@ class _UserHomePageState extends State<UserHomePage> {
             NexusSidebar(
               selectedIndex: _selectedIndex,
               onItemSelected: (i) => setState(() => _selectedIndex = i),
+              onLogout: () {
+                context.read<AuthCubit>().logout();
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                  (route) => false,
+                );
+              },
               items: [
                 NexusSidebarItem(icon: Icons.computer_outlined, label: "My Devices"),
                 NexusSidebarItem(icon: Icons.confirmation_number_outlined, label: "Support Tickets"),
@@ -205,14 +213,10 @@ class _UserHomePageState extends State<UserHomePage> {
     );
   }
 
-  // ──────────────────────────────────────────────
-  //  Tab 0: Devices View
-  // ──────────────────────────────────────────────
   Widget _buildDevicesView() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Topbar
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
           decoration: const BoxDecoration(
@@ -229,7 +233,6 @@ class _UserHomePageState extends State<UserHomePage> {
                 ],
               ),
               const Spacer(),
-              // Device ID chip
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
@@ -257,7 +260,6 @@ class _UserHomePageState extends State<UserHomePage> {
           ),
         ),
 
-        // Device Grid
         Expanded(
           child: Padding(
             padding: const EdgeInsets.all(32.0),
@@ -266,9 +268,9 @@ class _UserHomePageState extends State<UserHomePage> {
                 maxCrossAxisExtent: 400,
                 mainAxisSpacing: 32,
                 crossAxisSpacing: 32,
-                childAspectRatio: 1.0,
+                childAspectRatio: 0.7,
               ),
-              itemCount: 2, // mock until bloc wired
+              itemCount: 2,
               itemBuilder: (context, index) {
                 final isOnline = index == 0;
                 return _buildDeviceCard(
@@ -384,16 +386,12 @@ class _UserHomePageState extends State<UserHomePage> {
     );
   }
 
-  // ──────────────────────────────────────────────
-  //  Tab 1: Tickets View
-  // ──────────────────────────────────────────────
   Widget _buildTicketsView() {
     return BlocBuilder<TicketCubit, TicketState>(
       builder: (context, state) {
         return Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Left: Ticket List
             Container(
               width: 360,
               decoration: const BoxDecoration(
@@ -475,7 +473,6 @@ class _UserHomePageState extends State<UserHomePage> {
               ),
             ),
 
-            // Right: Ticket Detail
             Expanded(
               child: state.selectedTicket == null
                   ? Center(
@@ -491,7 +488,6 @@ class _UserHomePageState extends State<UserHomePage> {
                   : Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Ticket header
                         Container(
                           padding: const EdgeInsets.all(32),
                           decoration: const BoxDecoration(
@@ -516,7 +512,6 @@ class _UserHomePageState extends State<UserHomePage> {
                           ),
                         ),
 
-                        // Comments
                         Expanded(
                           child: state.isLoadingComments
                               ? const Center(child: CircularProgressIndicator())
@@ -552,7 +547,6 @@ class _UserHomePageState extends State<UserHomePage> {
                                 ),
                         ),
 
-                        // Comment input
                         Container(
                           padding: const EdgeInsets.all(24),
                           decoration: const BoxDecoration(

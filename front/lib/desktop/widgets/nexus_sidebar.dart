@@ -13,6 +13,7 @@ class NexusSidebar extends StatelessWidget {
   final ValueChanged<int> onItemSelected;
   final List<NexusSidebarItem> items;
   final Widget? bottomWidget;
+  final VoidCallback? onLogout;
 
   const NexusSidebar({
     super.key,
@@ -20,6 +21,7 @@ class NexusSidebar extends StatelessWidget {
     required this.onItemSelected,
     required this.items,
     this.bottomWidget,
+    this.onLogout,
   });
 
   @override
@@ -27,13 +29,12 @@ class NexusSidebar extends StatelessWidget {
     return Container(
       width: 260,
       decoration: const BoxDecoration(
-        color: AppTheme.bgDark, // Base solid
+        color: AppTheme.bgDark,
         border: Border(right: BorderSide(color: AppTheme.borderGlass)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Brand Header
           Padding(
             padding: const EdgeInsets.all(24.0),
             child: Row(
@@ -65,7 +66,6 @@ class NexusSidebar extends StatelessWidget {
             ),
           ),
 
-          // Menu section
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
             child: Text(
@@ -79,7 +79,6 @@ class NexusSidebar extends StatelessWidget {
             ),
           ),
 
-          // Menu Items
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -142,6 +141,39 @@ class NexusSidebar extends StatelessWidget {
               },
             ),
           ),
+
+          if (onLogout != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: onLogout,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.danger.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppTheme.danger.withOpacity(0.2)),
+                    ),
+                    child: Row(
+                      children: const [
+                        Icon(Icons.logout, color: AppTheme.danger, size: 20),
+                        SizedBox(width: 16),
+                        Text(
+                          "Log Out",
+                          style: TextStyle(
+                            color: AppTheme.danger,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
 
           if (bottomWidget != null)
             Padding(

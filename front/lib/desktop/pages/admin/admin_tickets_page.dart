@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:front/core/network/dio_admin.dart';
 import 'package:dio/dio.dart';
 import 'package:front/core/errors/error_handler.dart';
+import 'package:front/core/theme/app_theme.dart';
 
 
 class AdminTicketsPage extends StatefulWidget {
@@ -92,11 +93,13 @@ class _AdminTicketsPageState extends State<AdminTicketsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.bgDark,
       appBar: AppBar(
-        title: const Text("Support Tickets"),
+        backgroundColor: AppTheme.bgDark,
+        title: const Text("Support Tickets", style: TextStyle(color: AppTheme.textMain)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh, color: AppTheme.textMuted),
             onPressed: loadTickets,
             tooltip: "Refresh Tickets",
           )
@@ -104,153 +107,256 @@ class _AdminTicketsPageState extends State<AdminTicketsPage> {
       ),
       body: Row(
         children: [
+          // Ticket list panel
           Expanded(
             flex: 1,
             child: Container(
-              decoration: BoxDecoration(
-                border: Border(right: BorderSide(color: Colors.grey.shade300)),
+              decoration: const BoxDecoration(
+                border: Border(right: BorderSide(color: AppTheme.borderGlass)),
               ),
               child: isLoadingTickets
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const Center(child: CircularProgressIndicator(color: AppTheme.primary))
                   : tickets.isEmpty
-                  ? const Center(child: Text("No tickets found"))
+                  ? const Center(
+                      child: Text("No tickets found", style: TextStyle(color: AppTheme.textMuted)),
+                    )
                   : ListView.separated(
-                itemCount: tickets.length,
-                separatorBuilder: (_, __) => const Divider(height: 1),
-                itemBuilder: (context, index) {
-                  final ticket = tickets[index];
-                  final isSelected = selectedTicket?["id"] == ticket["id"];
+                      padding: const EdgeInsets.all(16),
+                      itemCount: tickets.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 8),
+                      itemBuilder: (context, index) {
+                        final ticket = tickets[index];
+                        final isSelected = selectedTicket?["id"] == ticket["id"];
 
-                  return ListTile(
-                    selected: isSelected,
-                    selectedTileColor: Colors.blue.shade50,
-                    title: Text(
-                      ticket["title"] ?? "No Title",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                      ),
+                        return InkWell(
+                          onTap: () => selectTicket(ticket),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? AppTheme.primary.withOpacity(0.1)
+                                  : AppTheme.panelBg,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isSelected
+                                    ? AppTheme.primary.withOpacity(0.4)
+                                    : AppTheme.borderGlass,
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  ticket["title"] ?? "No Title",
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                    color: AppTheme.textMain,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  "Status: ${ticket["status"]} • Priority: ${ticket["priority"]}",
+                                  style: const TextStyle(color: AppTheme.textMuted, fontSize: 13),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                    subtitle: Text("Status: ${ticket["status"]} • Priority: ${ticket["priority"]}"),
-                    onTap: () => selectTicket(ticket),
-                  );
-                },
-              ),
             ),
           ),
 
+          // Ticket detail panel
           Expanded(
             flex: 2,
             child: selectedTicket == null
-                ? const Center(
-              child: Text(
-                "Select a ticket to view details",
-                style: TextStyle(color: Colors.grey, fontSize: 16),
-              ),
-            )
+                ? Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.inbox_outlined, size: 64, color: AppTheme.textMuted.withOpacity(0.3)),
+                        const SizedBox(height: 16),
+                        const Text(
+                          "Select a ticket to view details",
+                          style: TextStyle(color: AppTheme.textMuted, fontSize: 16),
+                        ),
+                      ],
+                    ),
+                  )
                 : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              selectedTicket!["title"] ?? "",
-                              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          Chip(
-                            label: Text(selectedTicket!["status"] ?? ""),
-                            backgroundColor: selectedTicket!["status"] == "open"
-                                ? Colors.green.shade100
-                                : Colors.grey.shade200,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        selectedTicket!["description"] ?? "No description",
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  ),
-                ),
-                const Divider(height: 1),
-
-                Expanded(
-                  child: isLoadingComments
-                      ? const Center(child: CircularProgressIndicator())
-                      : ListView.builder(
-                    padding: const EdgeInsets.all(24),
-                    itemCount: comments.length,
-                    itemBuilder: (context, index) {
-                      final comment = comments[index];
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(8),
+                      // Header
+                      Container(
+                        padding: const EdgeInsets.all(24.0),
+                        decoration: const BoxDecoration(
+                          border: Border(bottom: BorderSide(color: AppTheme.borderGlass)),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              "User ID: ${comment["author"]}",
-                              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    selectedTicket!["title"] ?? "",
+                                    style: const TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppTheme.textMain,
+                                    ),
+                                  ),
+                                ),
+                                _statusChip(selectedTicket!["status"] ?? ""),
+                              ],
                             ),
-                            const SizedBox(height: 8),
-                            Text(comment["body"] ?? ""),
+                            const SizedBox(height: 16),
+                            Text(
+                              selectedTicket!["description"] ?? "No description",
+                              style: const TextStyle(fontSize: 15, color: AppTheme.textMuted, height: 1.6),
+                            ),
                           ],
                         ),
-                      );
-                    },
-                  ),
-                ),
+                      ),
 
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border(top: BorderSide(color: Colors.grey.shade300)),
-                  ),
-                  child: Row(
-                    children: [
+                      // Comments list
                       Expanded(
-                        child: TextField(
-                          controller: _commentController,
-                          decoration: const InputDecoration(
-                            hintText: "Write a reply...",
-                            border: OutlineInputBorder(),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                          ),
-                          onSubmitted: (_) => sendComment(),
+                        child: isLoadingComments
+                            ? const Center(child: CircularProgressIndicator(color: AppTheme.primary))
+                            : ListView.builder(
+                                padding: const EdgeInsets.all(24),
+                                itemCount: comments.length,
+                                itemBuilder: (context, index) {
+                                  final comment = comments[index];
+                                  return Container(
+                                    margin: const EdgeInsets.only(bottom: 16),
+                                    padding: const EdgeInsets.all(20),
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.panelBg,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: AppTheme.borderGlass),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            const Icon(Icons.person_outline, color: AppTheme.textMuted, size: 16),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              "User ID: ${comment["author"]}",
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: AppTheme.primary,
+                                                fontSize: 13,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Text(
+                                          comment["body"] ?? "",
+                                          style: const TextStyle(color: AppTheme.textMain, fontSize: 15, height: 1.5),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                      ),
+
+                      // Reply input
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: const BoxDecoration(
+                          border: Border(top: BorderSide(color: AppTheme.borderGlass)),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: _commentController,
+                                style: const TextStyle(color: AppTheme.textMain),
+                                decoration: InputDecoration(
+                                  hintText: "Write a reply...",
+                                  hintStyle: const TextStyle(color: AppTheme.textMuted),
+                                  filled: true,
+                                  fillColor: AppTheme.bgDark,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: const BorderSide(color: AppTheme.borderGlass),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: const BorderSide(color: AppTheme.borderGlass),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: const BorderSide(color: AppTheme.primary),
+                                  ),
+                                ),
+                                onSubmitted: (_) => sendComment(),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(colors: [AppTheme.primary, AppTheme.primaryDark]),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: ElevatedButton.icon(
+                                onPressed: sendComment,
+                                icon: const Icon(Icons.send),
+                                label: const Text("Reply"),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 16),
-                      ElevatedButton.icon(
-                        onPressed: sendComment,
-                        icon: const Icon(Icons.send),
-                        label: const Text("Reply"),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-                        ),
-                      )
                     ],
                   ),
-                )
-              ],
-            ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _statusChip(String status) {
+    Color color;
+    switch (status.toLowerCase()) {
+      case 'open':
+        color = AppTheme.primary;
+        break;
+      case 'in progress':
+        color = AppTheme.warning;
+        break;
+      case 'closed':
+        color = AppTheme.textMuted;
+        break;
+      default:
+        color = AppTheme.textMuted;
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Text(status, style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
     );
   }
 }

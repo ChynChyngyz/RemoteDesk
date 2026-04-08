@@ -147,10 +147,44 @@ class WebRTCService {
   Future<void> shareScreen() async {
     try {
       debugPrint("Requesting Display Media...");
-      final stream = await navigator.mediaDevices.getDisplayMedia({
-        "video": true,
-        "audio": false
-      });
+
+      MediaStream stream;
+
+      if (kIsWeb) {
+        stream = await navigator.mediaDevices.getDisplayMedia({
+          "video": true,
+          "audio": false
+        });
+      } else {
+        final sources = await desktopCapturer.getSources(types: [SourceType.Screen, SourceType.Window]);
+
+        if (sources.isEmpty) {
+          debugPrint("No display sources found!");
+          return;
+        }
+
+        DesktopCapturerSource? selectedSource;
+        for (var s in sources) {
+          if (s.type == SourceType.Screen) {
+            selectedSource = s;
+            break;
+          }
+        }
+        selectedSource ??= sources.first;
+
+        debugPrint("Selected source: ${selectedSource.id}");
+
+        stream = await navigator.mediaDevices.getDisplayMedia({
+          "video": {
+            "mandatory": {
+              "chromeMediaSource": "desktop",
+              "chromeMediaSourceId": selectedSource.id,
+            }
+          },
+          "audio": false
+        });
+      }
+
       debugPrint("Display Media Captured!");
 
       _localStream = stream;

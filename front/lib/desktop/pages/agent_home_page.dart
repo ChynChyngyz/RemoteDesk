@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/desktop/pages/remote_view_page.dart';
 import 'package:front/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:front/features/auth/presentation/bloc/auth_state.dart';
+import 'package:front/features/auth/presentation/pages/login_page.dart';
 import 'package:front/core/theme/app_theme.dart';
 import 'package:front/desktop/widgets/glass_panel.dart';
 import 'package:front/desktop/widgets/nexus_sidebar.dart';
@@ -35,6 +36,13 @@ class _AnyDeskPageState extends State<AnyDeskPage> {
               setState(() {
                 _selectedIndex = index;
               });
+            },
+            onLogout: () {
+              context.read<AuthCubit>().logout();
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const LoginPage()),
+                (route) => false,
+              );
             },
             items: [
               NexusSidebarItem(icon: Icons.home_outlined, label: "Home"),

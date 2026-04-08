@@ -18,19 +18,15 @@ class SignalConsumer(AsyncWebsocketConsumer):
         self.room = self.scope["url_route"]["kwargs"]["room"]
         print(f"[WS DEBUG] ID комнаты: {self.room}")
 
-        # ==========================================
-        # ВРЕМЕННЫЙ ХАК ДЛЯ CHROME
-        # ==========================================
-        if self.room == "chrome":
+        if not self.room.isdigit():
             self.room_group_name = f"room_{self.room}"
             await self.channel_layer.group_add(
                 self.room_group_name,
                 self.channel_name
             )
             await self.accept()
-            print("[WS DEBUG] УСПЕХ: Тестовое подключение к комнате chrome установлено!")
+            print(f"[WS DEBUG] УСПЕХ: Тестовое подключение к {self.room} установлено!")
             return
-        # ==========================================
 
         from .models import RemoteSession
         try:
@@ -45,13 +41,14 @@ class SignalConsumer(AsyncWebsocketConsumer):
             return
 
         if session.requester_user_id != user.id:
-            print(
-                f"[WS DEBUG] Отклонено: ID пользователя ({user.id}) не совпадает с создателем сессии ({session.requester_user_id})")
+            print(f"[WS DEBUG] Отклонено: ID пользователя ({user.id}) не совпадает с создателем сессии ({session.requester_user_id})")
             await self.close()
             return
 
         query = parse_qs(self.scope["query_string"].decode())
         token = query.get("token")
+
+        print(f"[WS DEBUG] Токен из URL: {token}. Ожидается: {session.access_token}")
 
         if not token or token[0] != session.access_token:
             print("[WS DEBUG] Отклонено: Токен не передан или не совпадает")

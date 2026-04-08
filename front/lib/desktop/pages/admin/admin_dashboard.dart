@@ -1,6 +1,9 @@
 // desktop/pages/admin/admin_dashboard.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:front/features/auth/presentation/bloc/auth_cubit.dart';
+import 'package:front/features/auth/presentation/pages/login_page.dart';
 import 'admin_overview_page.dart';
 import 'agent_token_page.dart';
 import 'organization_page.dart';
@@ -61,6 +64,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
             selectedIndex: index,
             onItemSelected: (i) {
               setState(() => index = i);
+            },
+            onLogout: () {
+              context.read<AuthCubit>().logout();
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const LoginPage()),
+                (route) => false,
+              );
             },
             items: [
               NexusSidebarItem(icon: Icons.dashboard_outlined, label: "Overview"),
