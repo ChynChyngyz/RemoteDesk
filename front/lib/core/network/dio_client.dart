@@ -7,7 +7,8 @@ class DioClient {
   static final DioInterceptor interceptor = DioInterceptor();
   static final Dio dio = Dio(
     BaseOptions(
-      baseUrl: "http://127.0.0.1:8000/api/v1/",
+      // baseUrl: "http://127.0.0.1:8000/api/v1/",
+      baseUrl: "http://127.0.0.1/api/v1/",
       headers: {
         "Content-Type": "application/json",
       },

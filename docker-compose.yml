@@ -40,8 +40,9 @@ services:
     env_file:
       - .env
     command: >
-      bash -c "python manage.py migrate --noinput &&
-               daphne -b 0.0.0.0 -p 8000 back.asgi:application"
+      sh -c "python manage.py collectstatic --noinput &&
+             python manage.py migrate --noinput &&
+             daphne -b 0.0.0.0 -p 8000 back.asgi:application"
     environment:
       - DB_HOST=db
       - DB_PORT=5432
@@ -52,6 +53,9 @@ services:
         condition: service_healthy
     networks:
       - internal_net
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
 
   nginx:
     image: nginx:alpine

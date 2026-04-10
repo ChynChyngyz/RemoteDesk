@@ -35,7 +35,8 @@ RUN pip install --no-cache /wheels/*
 
 COPY . .
 
-RUN chown -R appuser:appgroup /app
+RUN mkdir -p /app/static /app/media && \
+    chown -R appuser:appgroup /app
 
 USER appuser
 

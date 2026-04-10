@@ -31,7 +31,8 @@ class WebRTCService {
     final uri = Uri(
       scheme: 'ws',
       host: '127.0.0.1',
-      port: 8000,
+      // port: 8000,
+      port: 80,
       path: '/ws/signal/$room/',
       queryParameters: {
         'token': sessionToken,
